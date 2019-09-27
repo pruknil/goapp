@@ -1,4 +1,6 @@
 package router
 
-type in interface {
+type Router interface {
+	Start()
+	Shutdown()
 }

@@ -2,12 +2,16 @@ package socket
 
 import "fmt"
 
-type SocketRoute struct{}
+type Route struct{}
 
-func (SocketRoute) Start() {
+func New() {
+	fmt.Println("Socket Create")
+}
+
+func (Route) Start() {
 	fmt.Println("Socket Start")
 }
 
-func (SocketRoute) Shutdown() {
+func (Route) Shutdown() {
 	fmt.Println("Socket Shutdown")
 }

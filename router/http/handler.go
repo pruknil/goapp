@@ -2,12 +2,17 @@ package http
 
 import "fmt"
 
-type HttpRoute struct{}
+type Route struct {
+}
 
-func (HttpRoute) Start() {
+func New() Route {
+	return Route{}
+}
+
+func (Route) Start() {
 	fmt.Println("HttpRoute Start")
 }
 
-func (HttpRoute) Shutdown() {
+func (Route) Shutdown() {
 	fmt.Println("HttpRoute Shutdown")
 }

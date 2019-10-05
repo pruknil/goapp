@@ -93,7 +93,7 @@ loop:
 		rp.idleResources.Dequeue().Close()
 	}
 	for _, aw := range rp.activeWaits {
-		aw.ech <- errors.New("Resource pool closed")
+		aw.ech <- errors.New("resource_pool_closed")
 	}
 }
 

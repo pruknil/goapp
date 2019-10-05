@@ -38,17 +38,12 @@ func (g *Gin) Start() {
 }
 
 func (g *Gin) Shutdown() {
-	// Wait for interrupt signal to gracefully shutdown the server with
-	// a timeout of 5 seconds.
-
 	log.Println("Shutdown Server ...")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := g.srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
-	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
 		log.Println("timeout of 5 seconds.")

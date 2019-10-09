@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/pruknil/goapp/router/http"
-	"github.com/pruknil/goapp/router/protobuf"
+	"github.com/pruknil/goapp/router/socket"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,13 +13,13 @@ func main() {
 	gin := http.NewGin()
 	gin.Start()
 
-	proto := protobuf.NewProtoBuf()
-	proto.Start()
+	so := socket.NewSocket()
+	so.Start()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
 	gin.Shutdown()
-	proto.Shutdown()
+	so.Shutdown()
 }

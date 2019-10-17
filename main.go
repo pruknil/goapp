@@ -41,7 +41,7 @@ func buildContainer() *dig.Container {
 func NewRouter(svc service.Service) []router.Router {
 	var route []router.Router
 	route = append(route, http.NewGin(http.Config{Port: "8080"}, svc))
-	route = append(route, socket.NewSocket(socket.Config{Port: "1111"}))
+	route = append(route, socket.NewSocket(socket.Config{Port: "1111"}, svc))
 	return route
 }
 

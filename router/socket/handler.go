@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/ianlopshire/go-fixedwidth"
+	"github.com/pruknil/goapp/service"
 	"net"
 )
 
@@ -12,11 +13,12 @@ type Config struct {
 	Port string
 }
 type Socket struct {
-	config Config
+	config  Config
+	service service.Service
 }
 
-func NewSocket(cfg Config) *Socket {
-	return &Socket{config: cfg}
+func NewSocket(cfg Config, sv service.Service) *Socket {
+	return &Socket{config: cfg, service: sv}
 }
 
 func (r *Socket) Start() {

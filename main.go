@@ -4,6 +4,7 @@ import (
 	"github.com/pruknil/goapp/router"
 	"github.com/pruknil/goapp/router/http"
 	"github.com/pruknil/goapp/router/socket"
+	"github.com/pruknil/goapp/service"
 	"go.uber.org/dig"
 	"os"
 	"os/signal"
@@ -31,25 +32,19 @@ func invokeContainer(container *dig.Container) error {
 
 func buildContainer() *dig.Container {
 	container := dig.New()
-	container.Provide(NewConfig)
+	container.Provide(NewService)
 	container.Provide(NewRouter)
 
 	return container
 }
 
-func NewRouter() []router.Router {
+func NewRouter(svc service.Service) []router.Router {
 	var route []router.Router
-	route = append(route, http.NewGin(http.Config{Port: "8080"}))
-	route = append(route, socket.NewSocket())
+	route = append(route, http.NewGin(http.Config{Port: "8080"}, svc))
+	route = append(route, socket.NewSocket(socket.Config{Port: "1111"}))
 	return route
 }
 
-type Config struct {
-	Port string
-}
-
-func NewConfig() Config {
-	return Config{
-		Port: "8000",
-	}
+func NewService() service.Service {
+	return service.Service{}
 }

@@ -6,20 +6,22 @@ import (
 	"fmt"
 	"github.com/ianlopshire/go-fixedwidth"
 	"net"
-	"strconv"
 )
 
+type Config struct {
+	Port string
+}
 type Socket struct {
-	port int
+	config Config
 }
 
-func NewSocket() *Socket {
-	return &Socket{port: 1234}
+func NewSocket(cfg Config) *Socket {
+	return &Socket{config: cfg}
 }
 
 func (r *Socket) Start() {
 	go func() {
-		PORT := ":" + strconv.Itoa(r.port)
+		PORT := ":" + r.config.Port
 		l, err := net.Listen("tcp4", PORT)
 		if err != nil {
 			fmt.Println(err)

@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"github.com/pruknil/goapp/service"
 	"log"
 	"net/http"
 	"time"
@@ -13,19 +14,20 @@ type Config struct {
 	Port string
 }
 type Gin struct {
-	srv    *http.Server
-	config Config
+	srv     *http.Server
+	config  Config
+	service service.Service
 }
 
-func NewGin(cfg Config) *Gin {
-	return &Gin{config: cfg}
+func NewGin(cfg Config, sv service.Service) *Gin {
+	return &Gin{config: cfg, service: sv}
 }
 
 func (g *Gin) Start() {
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		//time.Sleep(5 * time.Second)
-		c.String(http.StatusOK, "Welcome Gin Server")
+		c.String(http.StatusOK, "Welcome Gin Server "+g.service.Echo())
 	})
 
 	g.srv = &http.Server{

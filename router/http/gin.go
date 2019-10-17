@@ -13,8 +13,8 @@ type Gin struct {
 	srv *http.Server
 }
 
-func NewGin() Gin {
-	return Gin{}
+func NewGin() *Gin {
+	return &Gin{}
 }
 
 func (g *Gin) Start() {

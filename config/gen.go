@@ -17,6 +17,9 @@ func main() {
 		if irow > 0 {
 			c := row.Cells
 			fmt.Println(c[0])
+			fmt.Println(c[1])
+			fmt.Println(c[2])
+			fmt.Println(c[3])
 			//for _, cell := range row.Cells {
 			//	text := cell.String()
 			//	fmt.Printf("%s\n", text)

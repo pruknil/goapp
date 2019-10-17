@@ -1,9 +1,13 @@
 package service
 
-type Service struct {
+type Service interface {
+	Echo() string
 }
 
-func (s *Service) Echo() string {
+type DemoService struct {
+}
+
+func (s *DemoService) Echo() string {
 	//fmt.Println("Echo")
 	return "ECHOOOOOO"
 }

@@ -46,5 +46,5 @@ func NewRouter(svc service.Service) []router.Router {
 }
 
 func NewService() service.Service {
-	return service.Service{}
+	return &service.DemoService{}
 }

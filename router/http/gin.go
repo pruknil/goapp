@@ -9,23 +9,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Config struct {
+	Port string
+}
 type Gin struct {
-	srv *http.Server
+	srv    *http.Server
+	config Config
 }
 
-func NewGin() *Gin {
-	return &Gin{}
+func NewGin(cfg Config) *Gin {
+	return &Gin{config: cfg}
 }
 
 func (g *Gin) Start() {
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
-		time.Sleep(5 * time.Second)
+		//time.Sleep(5 * time.Second)
 		c.String(http.StatusOK, "Welcome Gin Server")
 	})
 
 	g.srv = &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + g.config.Port,
 		Handler: router,
 	}
 

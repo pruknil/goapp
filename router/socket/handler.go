@@ -18,22 +18,23 @@ func NewSocket() *Socket {
 }
 
 func (r *Socket) Start() {
-	PORT := ":" + strconv.Itoa(r.port)
-	l, err := net.Listen("tcp4", PORT)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer l.Close()
-
-	for {
-		c, err := l.Accept()
+	go func() {
+		PORT := ":" + strconv.Itoa(r.port)
+		l, err := net.Listen("tcp4", PORT)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		go r.handleConnection(c)
-	}
+		defer l.Close()
+		for {
+			c, err := l.Accept()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			go r.handleConnection(c)
+		}
+	}()
 }
 
 func (r *Socket) Shutdown() {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/router"
 	"github.com/pruknil/goapp/router/http"
 	"github.com/pruknil/goapp/router/socket"
@@ -16,13 +17,24 @@ func main() {
 	invokeContainer(container)
 }
 func invokeContainer(container *dig.Container) error {
-	container.Invoke(func(route []router.Router) {
+	container.Invoke(func(route []router.Router, hsm hsm.IConnection) {
+
+		if err := hsm.Open(); err != nil {
+			panic(`
+				// ------------------------------------------------------------------------------
+				//! Fail to connect HSM: ` + err.Error() + `
+				// ------------------------------------------------------------------------------
+				`)
+		}
+
 		for _, v := range route {
 			v.Start()
 		}
+		//go backgroundTask()
 		quit := make(chan os.Signal)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		<-quit
+		hsm.Close()
 		for _, v := range route {
 			v.Shutdown()
 		}
@@ -34,8 +46,17 @@ func buildContainer() *dig.Container {
 	container := dig.New()
 	container.Provide(NewService)
 	container.Provide(NewRouter)
-
+	container.Provide(NewHSMConn)
+	container.Provide(NewHSM)
 	return container
+}
+
+func NewHSMConn() hsm.IConnection {
+	return hsm.New()
+}
+
+func NewHSM(b hsm.IConnection) hsm.IHSMService {
+	return hsm.NewHSM(b)
 }
 
 func NewRouter(svc service.Service) []router.Router {
@@ -45,6 +66,14 @@ func NewRouter(svc service.Service) []router.Router {
 	return route
 }
 
-func NewService() service.Service {
-	return &service.DemoService{}
+func NewService(h hsm.IHSMService) service.Service {
+	return &service.DemoService{IHSMService: h}
 }
+
+//
+//func backgroundTask() {
+//	ticker := time.NewTicker(1 * time.Second)
+//	for _ = range ticker.C {
+//		fmt.Println("Tock")
+//	}
+//}

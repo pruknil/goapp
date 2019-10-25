@@ -26,7 +26,6 @@ func NewGin(cfg Config, sv service.Service) *Gin {
 func (g *Gin) Start() {
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
-		//time.Sleep(5 * time.Second)
 		c.String(http.StatusOK, "Welcome Gin Server "+g.service.Echo())
 	})
 

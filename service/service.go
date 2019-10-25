@@ -3,17 +3,17 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/pruknil/goapp/backends/socket/hsm"
 	"log"
 	"time"
 )
 
-type commonFn func() error
+//type commonFn func() error
 
 func DoService(service ServiceTemplate) (ResMsg, error) {
 	defer func(s time.Time) {
 		log.Printf("elpased time %0.2d ns", time.Since(s).Nanoseconds())
 	}(time.Now())
-
 	if service.Validate() != nil {
 		return ResMsg{}, errors.New("Validate Error")
 	}
@@ -49,6 +49,7 @@ type ServiceTemplate interface {
 
 type DemoService struct {
 	ServiceTemplate
+	hsm.IHSMService
 	Request  ReqMsg
 	Response ResMsg
 }
@@ -79,11 +80,31 @@ func (s *DemoService) InputMapping() error {
 }
 
 func (s *DemoService) Business() error {
-	fmt.Println("Business")
+
+	s.IHSMService.CheckStatus()
+
+	s.Response = ResMsg{
+		Header: ResHeader{},
+		Body:   "hello" + s.Request.Body.(string),
+	}
 	return nil
 }
 
 func (s *DemoService) Echo() string {
-	DoService(s)
-	return "ECHOOOOOO"
+	s.setRequest(ReqMsg{
+		Header: ReqHeader{
+			FuncNm:       "a",
+			RqUID:        "b",
+			RqDt:         "",
+			RqAppID:      "123",
+			UserLangPref: "h",
+		},
+		Body: "Helllooo",
+	})
+
+	r, err := DoService(s)
+	if err != nil {
+		return "Doservice Error"
+	}
+	return r.Body.(string)
 }

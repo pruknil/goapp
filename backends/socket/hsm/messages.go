@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/ianlopshire/go-fixedwidth"
 	breaker "github.com/sony/gobreaker"
 	"net"
 	"strconv"
@@ -46,9 +47,34 @@ type HSM struct {
 }
 
 func (h *HSM) CheckStatus() string {
-	c, _ := h.RequestConnection()
-	h.doExecute(c, "")
-	return ""
+	conn, _ := h.RequestConnection()
+	str, _ := h.doExecute(conn, "01010000000101")
+	inTextByte := []byte(str)
+	c := &HSM_FN_01_Response{}
+	fixedwidth.Unmarshal(inTextByte, c)
+
+	return fmt.Sprintf("%#v", c)
+}
+
+type HSM_FN_01_Response struct {
+	ResponseHeader    string `fixed:"1,10"`
+	ResponseLen       string `fixed:"11,12"`
+	Fn                string `fixed:"13,14"`
+	Rc                string `fixed:"15,16"`
+	RAMStatus         string `fixed:"17,18"`
+	ROMStatus         string `fixed:"19,20"`
+	DESStatus         string `fixed:"21,22"`
+	HostPortStatus    string `fixed:"23,24"`
+	BatteryStatus     string `fixed:"25,26"`
+	AESStatus         string `fixed:"27,28"`
+	HardDiskStatus    string `fixed:"29,30"`
+	RSAAccelerator    string `fixed:"31,32"`
+	PerformanceLevel  string `fixed:"33,34"`
+	ResetCount        string `fixed:"35,38"`
+	CallsInLastMinute string `fixed:"39,46"`
+	CallsInLast10Mins string `fixed:"47,54"`
+	SoftwareIDLength  string `fixed:"55,56"`
+	SoftwareID        string `fixed:"57,64"`
 }
 
 func (h *HSM) doExecute(conn net.Conn, hexString string) (string, error) {

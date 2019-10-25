@@ -80,12 +80,9 @@ func (s *DemoService) InputMapping() error {
 }
 
 func (s *DemoService) Business() error {
-
-	s.IHSMService.CheckStatus()
-
 	s.Response = ResMsg{
 		Header: ResHeader{},
-		Body:   "hello" + s.Request.Body.(string),
+		Body:   s.IHSMService.CheckStatus(),
 	}
 	return nil
 }

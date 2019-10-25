@@ -9,20 +9,28 @@ import (
 
 type commonFn func() error
 
-func DoService(service ServiceTemplate) error {
+func DoService(service ServiceTemplate) (ResMsg, error) {
 	defer func(s time.Time) {
 		log.Printf("elpased time %0.2d ns", time.Since(s).Nanoseconds())
 	}(time.Now())
 
 	if service.Validate() != nil {
-		errors.New("Validate Error")
+		return ResMsg{}, errors.New("Validate Error")
 	}
 
-	service.InputMapping()
-	service.Business()
-	service.OutputMapping()
+	if service.InputMapping() != nil {
+		return ResMsg{}, errors.New("InputMapping Error")
+	}
 
-	return nil
+	if service.Business() != nil {
+		return ResMsg{}, errors.New("Business Error")
+	}
+
+	if service.OutputMapping() != nil {
+		return ResMsg{}, errors.New("OutputMapping Error")
+	}
+
+	return service.getResponse(), nil
 }
 
 type Service interface {
@@ -35,10 +43,24 @@ type ServiceTemplate interface {
 	OutputMapping() error
 	InputMapping() error
 	Business() error
+	setRequest(ReqMsg) error
+	getResponse() ResMsg
 }
 
 type DemoService struct {
 	ServiceTemplate
+	Request  ReqMsg
+	Response ResMsg
+}
+
+func (s *DemoService) getResponse() ResMsg {
+	fmt.Println("getResponse")
+	return s.Response
+}
+func (s *DemoService) setRequest(r ReqMsg) error {
+	fmt.Println("setRequest")
+	s.Request = r
+	return nil
 }
 
 func (s *DemoService) Validate() error {

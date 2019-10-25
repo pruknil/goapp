@@ -48,11 +48,10 @@ type HSM struct {
 
 func (h *HSM) CheckStatus() string {
 	conn, _ := h.RequestConnection()
-	str, _ := h.doExecute(conn, "01010000000101")
+	str, _ := h.ExecuteMessage(conn, "01010000000101")
 	inTextByte := []byte(str)
 	c := &HSM_FN_01_Response{}
 	fixedwidth.Unmarshal(inTextByte, c)
-
 	return fmt.Sprintf("%#v", c)
 }
 

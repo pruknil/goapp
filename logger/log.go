@@ -29,7 +29,7 @@ func New(fileName, lvl string) *logrus.Logger {
 		logg.SetLevel(level)
 	}
 	lumberjackLogrotate := &lumberjack.Logger{
-		Filename:   fmt.Sprintf("%s/%s-%s.log", LogFilePath, fileName, os.Getenv("CARDSERVICE_HTTP_PORT")),
+		Filename:   fmt.Sprintf("%s/%s-%s.log", LogFilePath, fileName, os.Getenv("PORT")),
 		MaxSize:    50, // Max megabytes before log is rotated
 		MaxBackups: -1, // Max number of old log files to keep
 		MaxAge:     90, // Max number of days to retain log files

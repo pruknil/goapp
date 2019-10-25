@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/pruknil/goapp/app"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/router"
 	"github.com/pruknil/goapp/router/http"
@@ -48,6 +49,7 @@ func buildContainer() *dig.Container {
 	container.Provide(NewRouter)
 	container.Provide(NewHSMConn)
 	container.Provide(NewHSM)
+	container.Provide(NewConfig)
 	return container
 }
 
@@ -68,6 +70,16 @@ func NewRouter(svc service.Service) []router.Router {
 
 func NewService(h hsm.IHSMService) service.Service {
 	return &service.DemoService{IHSMService: h}
+}
+func NewConfig() app.Config {
+	return app.Config{
+		Backend: app.Backend{
+			Hsm: app.Hsm{
+				Host: "localhost",
+				Port: "1111",
+			},
+		},
+	}
 }
 
 //

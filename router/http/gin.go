@@ -11,7 +11,10 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port         string
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+	IdleTimeout  time.Duration
 }
 type Gin struct {
 	srv     *http.Server
@@ -25,13 +28,18 @@ func NewGin(cfg Config, sv service.Service) *Gin {
 
 func (g *Gin) Start() {
 	router := gin.Default()
+
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome Gin Server "+g.service.Echo())
 	})
 
 	g.srv = &http.Server{
-		Addr:    ":" + g.config.Port,
-		Handler: router,
+		Addr:           ":" + g.config.Port,
+		Handler:        router,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		IdleTimeout:    10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 
 	go func() {

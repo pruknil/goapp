@@ -17,7 +17,7 @@ type Socket struct {
 	service service.Service
 }
 
-func NewSocket(cfg Config, sv service.Service) *Socket {
+func New(cfg Config, sv service.Service) *Socket {
 	return &Socket{config: cfg, service: sv}
 }
 

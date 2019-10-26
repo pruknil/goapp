@@ -7,18 +7,25 @@ import (
 	"time"
 )
 
+type Config struct {
+	Host string
+	Port string
+}
 type HSMConnection struct {
 	connPool pool.Pool
+	config   Config
 }
 
-func New() *HSMConnection {
-	return &HSMConnection{}
+func New(cfg Config) *HSMConnection {
+	return &HSMConnection{config: cfg}
 }
 
 func (h *HSMConnection) Open() error {
 	t, _ := time.ParseDuration("5s")
 	dialer := net.Dialer{Timeout: t}
-	factory := func() (net.Conn, error) { return dialer.Dial("tcp", "172.30.154.84:2048") }
+	factory := func() (net.Conn, error) {
+		return dialer.Dial("tcp", fmt.Sprintf("%s:%s", h.config.Host, h.config.Port))
+	}
 	p, err := pool.NewChannelPool(1, 2, factory)
 	if err != nil {
 		fmt.Println(err.Error())

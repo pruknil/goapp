@@ -1,12 +1,10 @@
 package app
 
+import "github.com/pruknil/goapp/backends/socket/hsm"
+
 type Config struct {
 	Backend
 }
 type Backend struct {
-	Hsm
-}
-type Hsm struct {
-	Host string
-	Port string
+	Hsm hsm.Config
 }

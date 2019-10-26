@@ -53,8 +53,8 @@ func buildContainer() *dig.Container {
 	return container
 }
 
-func NewHSMConn() hsm.IConnection {
-	return hsm.New()
+func NewHSMConn(cfg app.Config) hsm.IConnection {
+	return hsm.New(cfg.Hsm)
 }
 
 func NewHSM(b hsm.IConnection) hsm.IHSMService {
@@ -74,7 +74,7 @@ func NewService(h hsm.IHSMService) service.Service {
 func NewConfig() app.Config {
 	return app.Config{
 		Backend: app.Backend{
-			Hsm: app.Hsm{
+			Hsm: hsm.Config{
 				Host: "localhost",
 				Port: "1111",
 			},

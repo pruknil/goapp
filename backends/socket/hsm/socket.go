@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host        string
+	Port        string
+	ConnTimeout time.Duration
 }
 type HSMConnection struct {
 	connPool pool.Pool
@@ -46,5 +47,7 @@ func (h *HSMConnection) RequestConnection() (net.Conn, error) {
 }
 
 func (h *HSMConnection) Close() {
-	h.connPool.Close()
+	if h.connPool != nil {
+		h.connPool.Close()
+	}
 }

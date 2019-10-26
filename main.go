@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -19,15 +20,15 @@ func main() {
 }
 func invokeContainer(container *dig.Container) error {
 	container.Invoke(func(route []router.Router, hsm hsm.IConnection) {
-
-		if err := hsm.Open(); err != nil {
-			panic(`
-				// ------------------------------------------------------------------------------
-				//! Fail to connect HSM: ` + err.Error() + `
-				// ------------------------------------------------------------------------------
-				`)
-		}
-
+		/*
+			if err := hsm.Open(); err != nil {
+				panic(`
+					// ------------------------------------------------------------------------------
+					//! Fail to connect HSM: ` + err.Error() + `
+					// ------------------------------------------------------------------------------
+					`)
+			}
+		*/
 		for _, v := range route {
 			v.Start()
 		}
@@ -72,11 +73,13 @@ func NewService(h hsm.IHSMService) service.Service {
 	return &service.DemoService{IHSMService: h}
 }
 func NewConfig() app.Config {
+	connTmout, _ := time.ParseDuration("5s")
 	return app.Config{
 		Backend: app.Backend{
 			Hsm: hsm.Config{
-				Host: "localhost",
-				Port: "1111",
+				Host:        "localhost",
+				Port:        "1111",
+				ConnTimeout: connTmout,
 			},
 		},
 	}

@@ -44,12 +44,12 @@ func (g *Gin) Start() {
 	})
 
 	g.srv = &http.Server{
-		Addr:           ":" + g.config.Port,
-		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		IdleTimeout:    10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		Addr:         ":" + g.config.Port,
+		Handler:      router,
+		ReadTimeout:  g.config.ReadTimeout,
+		WriteTimeout: g.config.WriteTimeout,
+		IdleTimeout:  g.config.IdleTimeout,
+		//MaxHeaderBytes: 1 << 20,
 	}
 
 	go func() {

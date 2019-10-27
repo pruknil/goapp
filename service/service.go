@@ -34,7 +34,7 @@ func DoService(service ServiceTemplate) (ResMsg, error) {
 }
 
 type Service interface {
-	Echo() string
+	Echo(ReqMsg) ResMsg
 	//Speak() string
 }
 
@@ -87,7 +87,7 @@ func (s *DemoService) Business() error {
 	return nil
 }
 
-func (s *DemoService) Echo() string {
+func (s *DemoService) Echo(ReqMsg) ResMsg {
 	s.setRequest(ReqMsg{
 		Header: ReqHeader{
 			FuncNm:       "a",
@@ -99,9 +99,9 @@ func (s *DemoService) Echo() string {
 		Body: "Helllooo",
 	})
 
-	r, err := DoService(s)
-	if err != nil {
-		return "Doservice Error"
-	}
-	return r.Body.(string)
+	r, _ := DoService(s)
+	//if err != nil {
+	//	return "Doservice Error"
+	//}
+	return r
 }

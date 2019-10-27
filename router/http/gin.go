@@ -30,7 +30,17 @@ func (g *Gin) Start() {
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Welcome Gin Server "+g.service.Echo())
+		g.service.Echo(service.ReqMsg{
+			Header: service.ReqHeader{
+				FuncNm:       "Echo",
+				RqUID:        "",
+				RqDt:         "",
+				RqAppID:      "123",
+				UserLangPref: "th",
+			},
+			Body: nil,
+		})
+		c.String(http.StatusOK, "Welcome Gin Server ")
 	})
 
 	g.srv = &http.Server{

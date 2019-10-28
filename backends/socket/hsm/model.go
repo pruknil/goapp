@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ianlopshire/go-fixedwidth"
 	breaker "github.com/sony/gobreaker"
+	"gopkg.in/fatih/pool.v3"
 	"net"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ import (
 type HSM struct {
 	IConnection
 	*breaker.CircuitBreaker
-	config Config
+	Config
 }
 
 func NewHSM(b IConnection, c Config) IHSMService {
@@ -27,7 +28,7 @@ func NewHSM(b IConnection, c Config) IHSMService {
 		return counts.Requests >= 3 && failureRatio >= 0.6
 	}
 	cb := breaker.NewCircuitBreaker(st)
-	return &HSM{IConnection: b, CircuitBreaker: cb, config: c}
+	return &HSM{IConnection: b, CircuitBreaker: cb, Config: c}
 }
 
 func (h *HSM) ExecuteMessage(conn net.Conn, hexString string) (string, error) {
@@ -38,10 +39,18 @@ func (h *HSM) ExecuteMessage(conn net.Conn, hexString string) (string, error) {
 }
 
 func (h *HSM) CheckStatus() string {
-	conn, _ := h.requestConnection()
+	conn, err := h.requestConnection()
+	if err != nil {
+		//fmt.Println(err.Error())
+		return err.Error()
+	}
+	defer conn.Close()
 	str, err := h.ExecuteMessage(conn, "01010000000101")
 	if err != nil {
-		fmt.Println(err.Error())
+		if pc, ok := conn.(*pool.PoolConn); ok {
+			pc.MarkUnusable()
+		}
+		return err.Error()
 	}
 	//fmt.Println(str)
 	inTextByte := []byte(str)
@@ -55,11 +64,11 @@ func (h *HSM) doExecute(conn net.Conn, hexString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = conn.SetReadDeadline(time.Now().Add(h.config.ReadDeadline))
+	err = conn.SetReadDeadline(time.Now().Add(h.Config.ReadDeadline))
 	if err != nil {
 		return "", fmt.Errorf("SetReadDeadline failed:%s\n", err.Error())
 	}
-	err = conn.SetWriteDeadline(time.Now().Add(h.config.WriteDeadline))
+	err = conn.SetWriteDeadline(time.Now().Add(h.Config.WriteDeadline))
 	if err != nil {
 		return "", fmt.Errorf("SetWriteDeadline failed:%s\n", err.Error())
 	}

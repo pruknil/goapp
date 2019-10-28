@@ -74,7 +74,8 @@ func (r *Socket) handleConnection(c net.Conn) {
 		//} else if strings.HasPrefix(header.Fn, "ee0800") {
 		//	byteReturn = encryptFunc(raw[76:92])
 		//}
-
+		by, _ := hex.DecodeString("01010000001d0100000000000000000000030000002a000001a6084d3039393939394500000000000000000000000000")
+		byteReturn = []byte(by)
 		c.Write(byteReturn)
 
 	}

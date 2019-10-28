@@ -78,11 +78,13 @@ func NewConfig() app.Config {
 	return app.Config{
 		Backend: app.Backend{
 			Hsm: hsm.Config{
-				Host:          "10.215.138.214",
-				Port:          "2012",
+				Host:          "localhost",
+				Port:          "1111",
 				ConnTimeout:   fiveSec,
 				ReadDeadline:  fiveSec,
 				WriteDeadline: fiveSec,
+				PoolMin:       2,
+				PoolMax:       3,
 			},
 		},
 		Router: app.Router{
@@ -95,11 +97,3 @@ func NewConfig() app.Config {
 		},
 	}
 }
-
-//
-//func backgroundTask() {
-//	ticker := time.NewTicker(1 * time.Second)
-//	for _ = range ticker.C {
-//		fmt.Println("Tock")
-//	}
-//}

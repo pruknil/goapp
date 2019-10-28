@@ -19,7 +19,7 @@ func main() {
 	invokeContainer(container)
 }
 func invokeContainer(container *dig.Container) error {
-	container.Invoke(func(route []router.Router, hsm hsm.IConnection) {
+	return container.Invoke(func(route []router.Router, hsm hsm.IConnection) {
 		/*
 			if err := hsm.Open(); err != nil {
 				panic(`
@@ -41,7 +41,6 @@ func invokeContainer(container *dig.Container) error {
 			v.Shutdown()
 		}
 	})
-	return nil
 }
 
 func buildContainer() *dig.Container {

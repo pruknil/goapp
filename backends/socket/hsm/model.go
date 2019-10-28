@@ -15,9 +15,10 @@ import (
 type HSM struct {
 	IConnection
 	*breaker.CircuitBreaker
+	config Config
 }
 
-func NewHSM(b IConnection) IHSMService {
+func NewHSM(b IConnection, c Config) IHSMService {
 	var st breaker.Settings
 	st.Name = "HSM"
 	st.Timeout = 3
@@ -26,7 +27,7 @@ func NewHSM(b IConnection) IHSMService {
 		return counts.Requests >= 3 && failureRatio >= 0.6
 	}
 	cb := breaker.NewCircuitBreaker(st)
-	return &HSM{IConnection: b, CircuitBreaker: cb}
+	return &HSM{IConnection: b, CircuitBreaker: cb, config: c}
 }
 
 func (h *HSM) ExecuteMessage(conn net.Conn, hexString string) (string, error) {
@@ -37,8 +38,12 @@ func (h *HSM) ExecuteMessage(conn net.Conn, hexString string) (string, error) {
 }
 
 func (h *HSM) CheckStatus() string {
-	conn, _ := h.RequestConnection()
-	str, _ := h.ExecuteMessage(conn, "01010000000101")
+	conn, _ := h.requestConnection()
+	str, err := h.ExecuteMessage(conn, "01010000000101")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	//fmt.Println(str)
 	inTextByte := []byte(str)
 	c := &HSM_FN_01_Response{}
 	fixedwidth.Unmarshal(inTextByte, c)
@@ -46,15 +51,17 @@ func (h *HSM) CheckStatus() string {
 }
 
 func (h *HSM) doExecute(conn net.Conn, hexString string) (string, error) {
-
 	byteArray, err := hex.DecodeString(hexString)
 	if err != nil {
 		return "", err
 	}
-	timeout, _ := time.ParseDuration("5s")
-	err = conn.SetReadDeadline(time.Now().Add(timeout))
+	err = conn.SetReadDeadline(time.Now().Add(h.config.ReadDeadline))
 	if err != nil {
 		return "", fmt.Errorf("SetReadDeadline failed:%s\n", err.Error())
+	}
+	err = conn.SetWriteDeadline(time.Now().Add(h.config.WriteDeadline))
+	if err != nil {
+		return "", fmt.Errorf("SetWriteDeadline failed:%s\n", err.Error())
 	}
 	_, err = conn.Write(byteArray)
 	if err != nil {

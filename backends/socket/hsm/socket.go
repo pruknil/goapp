@@ -8,9 +8,11 @@ import (
 )
 
 type Config struct {
-	Host        string
-	Port        string
-	ConnTimeout time.Duration
+	Host          string
+	Port          string
+	ConnTimeout   time.Duration
+	ReadDeadline  time.Duration
+	WriteDeadline time.Duration
 }
 type HSMConnection struct {
 	connPool pool.Pool
@@ -22,8 +24,7 @@ func New(cfg Config) *HSMConnection {
 }
 
 func (h *HSMConnection) Open() error {
-	t, _ := time.ParseDuration("5s")
-	dialer := net.Dialer{Timeout: t}
+	dialer := net.Dialer{Timeout: h.config.ConnTimeout}
 	factory := func() (net.Conn, error) {
 		return dialer.Dial("tcp", fmt.Sprintf("%s:%s", h.config.Host, h.config.Port))
 	}
@@ -36,9 +37,12 @@ func (h *HSMConnection) Open() error {
 	return nil
 }
 
-func (h *HSMConnection) RequestConnection() (net.Conn, error) {
-	conn, err := h.connPool.Get()
+func (h *HSMConnection) requestConnection() (net.Conn, error) {
+	if h.connPool == nil {
+		h.Open()
+	}
 
+	conn, err := h.connPool.Get()
 	if err != nil {
 		return nil, err
 	}

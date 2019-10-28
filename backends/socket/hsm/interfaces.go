@@ -5,7 +5,7 @@ import "net"
 type IConnection interface {
 	Open() error
 	Close()
-	RequestConnection() (net.Conn, error)
+	requestConnection() (net.Conn, error)
 }
 
 type IHSMService interface {

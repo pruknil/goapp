@@ -58,8 +58,8 @@ func NewHSMConn(cfg app.Config) hsm.IConnection {
 	return hsm.New(cfg.Hsm)
 }
 
-func NewHSM(b hsm.IConnection) hsm.IHSMService {
-	return hsm.NewHSM(b)
+func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
+	return hsm.NewHSM(b, cfg.Hsm)
 }
 
 func NewRouter(svc service.Service, conf app.Config) []router.Router {
@@ -73,14 +73,16 @@ func NewService(h hsm.IHSMService) service.Service {
 	return &service.DemoService{IHSMService: h}
 }
 func NewConfig() app.Config {
-	connTmout, _ := time.ParseDuration("5s")
+	fiveSec, _ := time.ParseDuration("5s")
 	tenSec, _ := time.ParseDuration("10s")
 	return app.Config{
 		Backend: app.Backend{
 			Hsm: hsm.Config{
-				Host:        "localhost",
-				Port:        "1111",
-				ConnTimeout: connTmout,
+				Host:          "10.215.138.214",
+				Port:          "2012",
+				ConnTimeout:   fiveSec,
+				ReadDeadline:  fiveSec,
+				WriteDeadline: fiveSec,
 			},
 		},
 		Router: app.Router{

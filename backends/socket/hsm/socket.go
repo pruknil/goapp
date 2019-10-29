@@ -30,10 +30,11 @@ func New(cfg Config) *HSMConnection {
 }
 
 func (h *HSMConnection) ping() {
-	ticker := time.NewTicker(15 * time.Second)
-	go func() {
+	t := time.NewTicker(15 * time.Second)
+	go func(ticker *time.Ticker) {
 		for range ticker.C {
 			if h.connPool != nil {
+			START:
 				fmt.Println("connPool >>", h.connPool.Len())
 				c, err := h.connPool.Get()
 				if err == nil && c != nil {
@@ -52,12 +53,13 @@ func (h *HSMConnection) ping() {
 						if pc, ok := c.(*pool.PoolConn); ok {
 							pc.MarkUnusable()
 						}
+						goto START
 					}
 					c.Close()
 				}
 			}
 		}
-	}()
+	}(t)
 }
 
 func (h *HSMConnection) Open() error {

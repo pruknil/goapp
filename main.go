@@ -77,13 +77,15 @@ func NewConfig() app.Config {
 	return app.Config{
 		Backend: app.Backend{
 			Hsm: hsm.Config{
+				//Host:          "172.30.154.84",
+				//Port:          "2048",
 				Host:          "localhost",
 				Port:          "1111",
 				ConnTimeout:   fiveSec,
 				ReadDeadline:  fiveSec,
 				WriteDeadline: fiveSec,
-				PoolMin:       2,
-				PoolMax:       3,
+				PoolMin:       5,
+				PoolMax:       5,
 			},
 		},
 		Router: app.Router{

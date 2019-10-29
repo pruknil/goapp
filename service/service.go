@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"log"
 	"time"
@@ -36,7 +35,6 @@ func DoService(req ReqMsg, service ServiceTemplate) (ResMsg, error) {
 
 type Service interface {
 	HSMStatus(ReqMsg) ResMsg
-	//Speak() string
 }
 
 type ServiceTemplate interface {
@@ -48,7 +46,7 @@ type ServiceTemplate interface {
 	getResponse() ResMsg
 }
 
-type DemoService struct {
+type HSMService struct {
 	ServiceTemplate
 	Request  ReqMsg
 	Response ResMsg
@@ -56,42 +54,37 @@ type DemoService struct {
 	backendResp *hsm.HSMStatusResponse
 }
 
-func (s *DemoService) getResponse() ResMsg {
-	fmt.Println("getResponse")
-	s.Response = ResMsg{
-		Header: ResHeader{},
-		Body:   s.backendResp,
-	}
+func (s *HSMService) getResponse() ResMsg {
 	return s.Response
 }
-func (s *DemoService) setRequest(r ReqMsg) error {
-	fmt.Println("setRequest")
+
+func (s *HSMService) setRequest(r ReqMsg) error {
 	s.Request = r
 	return nil
 }
 
-func (s *DemoService) Validate() error {
-	fmt.Println("Validate")
+func (s *HSMService) Validate() error {
 	return nil
 }
 
-func (s *DemoService) OutputMapping() error {
-	fmt.Println("OutputMapping")
+func (s *HSMService) OutputMapping() error {
+	s.Response = ResMsg{
+		Header: ResHeader{},
+		Body:   s.backendResp,
+	}
 	return nil
 }
 
-func (s *DemoService) InputMapping() error {
-	fmt.Println("InputMapping")
-
+func (s *HSMService) InputMapping() error {
 	return nil
 }
 
-func (s *DemoService) Business() error {
+func (s *HSMService) Business() error {
 	s.backendResp = s.IHSMService.CheckStatus()
 	return nil
 }
 
-func (s *DemoService) HSMStatus(req ReqMsg) ResMsg {
+func (s *HSMService) HSMStatus(req ReqMsg) ResMsg {
 
 	r, _ := DoService(req, s)
 	//if err != nil {

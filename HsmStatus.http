@@ -1,18 +1,15 @@
-### GET request that fetches hall the hotels
-GET http://localhost:8080/hotels/all
-Content-Type: application/json
-### GET request that fetches hotels by name
-GET http://localhost:8080/hotels/Ibis
-Content-Type: application/json
-### POST request to checkin some guests.An empty line needs to separate the request header from the actual payload.
+### Send POST request with json body
 POST http://localhost:8080/hsm
 Content-Type: application/json
+
 {
-	"funcNm": "HSMStatus",
-	"rqUID": "",
-	"rqDt": "",
-	"rqAppId": "123",
-	"userLangPref" : "th"
+  "Header":{
+    "funcNm": "HSMStatus",
+    "rqUID": "",
+    "rqDt": "",
+    "rqAppId": "123",
+    "userLangPref" : "th"
+  }
 }
 
 ###

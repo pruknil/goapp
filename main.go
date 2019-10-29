@@ -69,7 +69,7 @@ func NewRouter(svc service.Service, conf app.Config) []router.Router {
 }
 
 func NewService(h hsm.IHSMService) service.Service {
-	return &service.DemoService{IHSMService: h}
+	return &service.HSMService{IHSMService: h}
 }
 func NewConfig() app.Config {
 	fiveSec, _ := time.ParseDuration("5s")

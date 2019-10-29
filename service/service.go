@@ -10,10 +10,11 @@ import (
 
 //type commonFn func() error
 
-func DoService(service ServiceTemplate) (ResMsg, error) {
+func DoService(req ReqMsg, service ServiceTemplate) (ResMsg, error) {
 	defer func(s time.Time) {
 		log.Printf("elpased time %0.2d ns", time.Since(s).Nanoseconds())
 	}(time.Now())
+	service.setRequest(req)
 	if service.Validate() != nil {
 		return ResMsg{}, errors.New("Validate Error")
 	}
@@ -34,7 +35,7 @@ func DoService(service ServiceTemplate) (ResMsg, error) {
 }
 
 type Service interface {
-	Echo(ReqMsg) ResMsg
+	HSMStatus(ReqMsg) ResMsg
 	//Speak() string
 }
 
@@ -49,9 +50,10 @@ type ServiceTemplate interface {
 
 type DemoService struct {
 	ServiceTemplate
-	hsm.IHSMService
 	Request  ReqMsg
 	Response ResMsg
+	hsm.IHSMService
+	backendResp *hsm.HSMStatusResponse
 }
 
 func (s *DemoService) getResponse() ResMsg {
@@ -76,30 +78,22 @@ func (s *DemoService) OutputMapping() error {
 
 func (s *DemoService) InputMapping() error {
 	fmt.Println("InputMapping")
+
 	return nil
 }
 
 func (s *DemoService) Business() error {
+	s.backendResp = s.IHSMService.CheckStatus()
 	s.Response = ResMsg{
 		Header: ResHeader{},
-		Body:   s.IHSMService.CheckStatus(),
+		Body:   s.backendResp,
 	}
 	return nil
 }
 
-func (s *DemoService) Echo(ReqMsg) ResMsg {
-	s.setRequest(ReqMsg{
-		Header: ReqHeader{
-			FuncNm:       "a",
-			RqUID:        "b",
-			RqDt:         "",
-			RqAppID:      "123",
-			UserLangPref: "h",
-		},
-		Body: "Helllooo",
-	})
+func (s *DemoService) HSMStatus(req ReqMsg) ResMsg {
 
-	r, _ := DoService(s)
+	r, _ := DoService(req, s)
 	//if err != nil {
 	//	return "Doservice Error"
 	//}

@@ -20,32 +20,30 @@ type Gin struct {
 	srv     *http.Server
 	config  Config
 	service service.Service
+	router  *gin.Engine
 }
 
 func NewGin(cfg Config, sv service.Service) *Gin {
 	return &Gin{config: cfg, service: sv}
 }
 
+func (g *Gin) initializeRoutes() {
+	g.router.POST("/hsm", g.callHsm)
+}
+
+func (g *Gin) callHsm(c *gin.Context) {
+	var u service.ReqMsg
+	c.BindJSON(&u)
+	resMsg := g.service.HSMStatus(u)
+	c.JSON(http.StatusOK, resMsg)
+}
+
 func (g *Gin) Start() {
-	router := gin.Default()
-
-	router.GET("/", func(c *gin.Context) {
-		res := g.service.Echo(service.ReqMsg{
-			Header: service.ReqHeader{
-				FuncNm:       "Echo",
-				RqUID:        "",
-				RqDt:         "",
-				RqAppID:      "123",
-				UserLangPref: "th",
-			},
-			Body: nil,
-		})
-		c.String(http.StatusOK, "Welcome Gin Server "+res.Body.(string))
-	})
-
+	g.router = gin.Default()
+	g.initializeRoutes()
 	g.srv = &http.Server{
 		Addr:         ":" + g.config.Port,
-		Handler:      router,
+		Handler:      g.router,
 		ReadTimeout:  g.config.ReadTimeout,
 		WriteTimeout: g.config.WriteTimeout,
 		IdleTimeout:  g.config.IdleTimeout,

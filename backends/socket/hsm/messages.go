@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type HSM_FN_01_Response struct {
+type HSMStatusResponse struct {
 	ResponseHeader    string `fixed:"1,10"`
 	ResponseLen       string `fixed:"11,12"`
 	Fn                string `fixed:"13,14"`

@@ -16,6 +16,7 @@ type Config struct {
 	WriteTimeout time.Duration
 	IdleTimeout  time.Duration
 }
+
 type Gin struct {
 	srv     *http.Server
 	config  Config
@@ -24,7 +25,10 @@ type Gin struct {
 }
 
 func NewGin(cfg Config, sv service.Service) *Gin {
-	return &Gin{config: cfg, service: sv}
+	return &Gin{
+		config:  cfg,
+		service: sv,
+	}
 }
 
 func (g *Gin) initializeRoutes() {
@@ -34,8 +38,7 @@ func (g *Gin) initializeRoutes() {
 func (g *Gin) callHsm(c *gin.Context) {
 	var u service.ReqMsg
 	c.BindJSON(&u)
-	resMsg := g.service.HSMStatus(u)
-	c.JSON(http.StatusOK, resMsg)
+	c.JSON(http.StatusOK, g.service.HSMStatus(u))
 }
 
 func (g *Gin) Start() {

@@ -58,6 +58,10 @@ type DemoService struct {
 
 func (s *DemoService) getResponse() ResMsg {
 	fmt.Println("getResponse")
+	s.Response = ResMsg{
+		Header: ResHeader{},
+		Body:   s.backendResp,
+	}
 	return s.Response
 }
 func (s *DemoService) setRequest(r ReqMsg) error {
@@ -84,10 +88,6 @@ func (s *DemoService) InputMapping() error {
 
 func (s *DemoService) Business() error {
 	s.backendResp = s.IHSMService.CheckStatus()
-	s.Response = ResMsg{
-		Header: ResHeader{},
-		Body:   s.backendResp,
-	}
 	return nil
 }
 

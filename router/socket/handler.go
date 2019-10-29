@@ -18,13 +18,15 @@ type Socket struct {
 }
 
 func New(cfg Config, sv service.Service) *Socket {
-	return &Socket{config: cfg, service: sv}
+	return &Socket{
+		config:  cfg,
+		service: sv,
+	}
 }
 
 func (r *Socket) Start() {
 	go func() {
-		PORT := ":" + r.config.Port
-		l, err := net.Listen("tcp4", PORT)
+		l, err := net.Listen("tcp4", ":"+r.config.Port)
 		if err != nil {
 			fmt.Println(err)
 			return

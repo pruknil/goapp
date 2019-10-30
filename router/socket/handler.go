@@ -14,10 +14,10 @@ type Config struct {
 }
 type Socket struct {
 	config  Config
-	service service.IService
+	service service.ISocketService
 }
 
-func New(cfg Config, sv service.IService) *Socket {
+func New(cfg Config, sv service.ISocketService) *Socket {
 	return &Socket{
 		config:  cfg,
 		service: sv,
@@ -76,13 +76,20 @@ func (r *Socket) handleConnection(c net.Conn) {
 		//} else if strings.HasPrefix(header.Fn, "ee0800") {
 		//	byteReturn = encryptFunc(raw[76:92])
 		//}
-		by, _ := hex.DecodeString("01010000001d0100000000000000000000030000002a000001a6084d3039393939394500000000000000000000000000")
-		byteReturn = []byte(by)
+		//by, _ := hex.DecodeString("01010000001d0100000000000000000000030000002a000001a6084d3039393939394500000000000000000000000000")
+		//byteReturn = []byte(by)
+		byteReturn = r.dispatchService(raw)
 		c.Write(byteReturn)
 
 	}
 	c.Close()
 	fmt.Println("Disconnect ", c.RemoteAddr().Network())
+}
+
+func (r *Socket) dispatchService(raw string) []byte {
+	req := service.ReqMsg{}
+	response := r.service.HSMFunc01(req)
+	return response.Body.([]byte)
 }
 
 type SocketMsg struct {

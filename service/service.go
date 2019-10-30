@@ -33,7 +33,7 @@ func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
 	return service.getResponse(), nil
 }
 
-type IService interface {
+type IHSMService interface {
 	HSMStatus(ReqMsg) ResMsg
 }
 

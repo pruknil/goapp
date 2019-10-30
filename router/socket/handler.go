@@ -14,10 +14,10 @@ type Config struct {
 }
 type Socket struct {
 	config  Config
-	service service.Service
+	service service.IService
 }
 
-func New(cfg Config, sv service.Service) *Socket {
+func New(cfg Config, sv service.IService) *Socket {
 	return &Socket{
 		config:  cfg,
 		service: sv,

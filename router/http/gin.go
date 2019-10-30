@@ -20,11 +20,11 @@ type Config struct {
 type Gin struct {
 	srv     *http.Server
 	config  Config
-	service service.Service
+	service service.IService
 	router  *gin.Engine
 }
 
-func NewGin(cfg Config, sv service.Service) *Gin {
+func NewGin(cfg Config, sv service.IService) *Gin {
 	return &Gin{
 		config:  cfg,
 		service: sv,

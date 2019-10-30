@@ -19,16 +19,7 @@ func main() {
 	invokeContainer(container)
 }
 func invokeContainer(container *dig.Container) error {
-	return container.Invoke(func(route []router.Router, hsm hsm.IConnection) {
-		/*
-			if err := hsm.Open(); err != nil {
-				panic(`
-					// ------------------------------------------------------------------------------
-					//! Fail to connect HSM: ` + err.Error() + `
-					// ------------------------------------------------------------------------------
-					`)
-			}
-		*/
+	return container.Invoke(func(route []router.IRouter, hsm hsm.IConnection) {
 		for _, v := range route {
 			v.Start()
 		}
@@ -61,14 +52,14 @@ func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
 
-func NewRouter(svc service.Service, conf app.Config) []router.Router {
-	var route []router.Router
+func NewRouter(svc service.IService, conf app.Config) []router.IRouter {
+	var route []router.IRouter
 	route = append(route, http.NewGin(conf.Router.Http, svc))
-	route = append(route, socket.New(socket.Config{Port: "1111"}, svc))
+	route = append(route, socket.New(conf.Router.Socket, svc))
 	return route
 }
 
-func NewService(h hsm.IHSMService) service.Service {
+func NewService(h hsm.IHSMService) service.IService {
 	return &service.HSMService{IHSMService: h}
 }
 func NewConfig() app.Config {
@@ -94,6 +85,9 @@ func NewConfig() app.Config {
 				ReadTimeout:  tenSec,
 				WriteTimeout: tenSec,
 				IdleTimeout:  tenSec,
+			},
+			Socket: socket.Config{
+				Port: "1111",
 			},
 		},
 	}

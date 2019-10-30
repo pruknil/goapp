@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/router/http"
+	"github.com/pruknil/goapp/router/socket"
 )
 
 type Config struct {
@@ -11,7 +12,8 @@ type Config struct {
 }
 
 type Router struct {
-	Http http.Config
+	Http   http.Config
+	Socket socket.Config
 }
 
 type Backend struct {

@@ -1,6 +1,6 @@
 package router
 
-type Router interface {
+type IRouter interface {
 	Start()
 	Shutdown()
 }

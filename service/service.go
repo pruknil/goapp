@@ -9,7 +9,7 @@ import (
 
 //type commonFn func() error
 
-func DoService(req ReqMsg, service ServiceTemplate) (ResMsg, error) {
+func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
 	defer func(s time.Time) {
 		log.Printf("elpased time %0.2d ns", time.Since(s).Nanoseconds())
 	}(time.Now())
@@ -33,11 +33,11 @@ func DoService(req ReqMsg, service ServiceTemplate) (ResMsg, error) {
 	return service.getResponse(), nil
 }
 
-type Service interface {
+type IService interface {
 	HSMStatus(ReqMsg) ResMsg
 }
 
-type ServiceTemplate interface {
+type IServiceTemplate interface {
 	Validate() error
 	OutputMapping() error
 	InputMapping() error
@@ -47,7 +47,7 @@ type ServiceTemplate interface {
 }
 
 type HSMService struct {
-	ServiceTemplate
+	IServiceTemplate
 	Request  ReqMsg
 	Response ResMsg
 	hsm.IHSMService

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"github.com/natefinch/lumberjack"
+	"github.com/pruknil/goapp/app"
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -17,7 +18,18 @@ const STATUS = "status"
 const RSUID = "rsuid"
 const TM = "tm"
 
-func New(fileName, lvl string) *logrus.Logger {
+type Logger struct {
+	*logrus.Logger
+}
+
+func New(config app.Config) AppLog {
+	return AppLog{config: config}
+}
+func (al *AppLog) NewLog(fileName, lvl string) Logger {
+	return Logger{al.NewLogrus(fileName, lvl)}
+}
+
+func (al *AppLog) NewLogrus(fileName, lvl string) *logrus.Logger {
 	LogFilePath := os.Getenv("LOG_PATH")
 	if LogFilePath == "" {
 		LogFilePath = "/tmp"
@@ -69,9 +81,10 @@ func (f *restFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 
 type AppLog struct {
-	Trace *logrus.Logger
-	Perf  *logrus.Logger
-	Error *logrus.Logger
-	Rest  *logrus.Logger
-	Audit *logrus.Logger
+	config app.Config
+	Trace  Logger
+	Perf   Logger
+	Error  Logger
+	Rest   Logger
+	Audit  Logger
 }

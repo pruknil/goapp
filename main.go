@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/pruknil/goapp/app"
 	"github.com/pruknil/goapp/backends/socket/hsm"
+	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router"
 	"github.com/pruknil/goapp/router/http"
 	"github.com/pruknil/goapp/router/socket"
@@ -37,6 +38,7 @@ func invokeContainer(container *dig.Container) error {
 func buildContainer() *dig.Container {
 	container := dig.New()
 	container.Provide(NewConfig)
+	container.Provide(NewLogger)
 
 	container.Provide(NewHSMConn)
 
@@ -48,8 +50,16 @@ func buildContainer() *dig.Container {
 	return container
 }
 
-func NewHSMConn(cfg app.Config) hsm.IConnection {
-	return hsm.New(cfg.Hsm)
+func NewLogger(cfg app.Config) logger.AppLog {
+	al := logger.New(cfg)
+	al.Error = al.NewLog("error", "info")
+	al.Perf = al.NewLog("perf", "info")
+	al.Trace = al.NewLog("trace", "info")
+	return al
+}
+
+func NewHSMConn(cfg app.Config, log logger.AppLog) hsm.IConnection {
+	return hsm.New(cfg.Hsm, log)
 }
 
 func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
@@ -101,3 +111,46 @@ func NewConfig() app.Config {
 		},
 	}
 }
+
+/*
+func ydb() {
+	// Set global node ["^hello", "world"] to "Go World"
+	err := yottadb.SetValE(yottadb.NOTTP, nil, "Go World", "^hello", []string{"world"})
+	if err != nil {
+		panic(err)
+	}
+
+	// Retrieve the value that was set
+	r, err := yottadb.ValE(yottadb.NOTTP, nil, "^hello", []string{"world"})
+	if err != nil {
+		panic(err)
+	}
+	if r != "Go World" {
+		panic("Value not what was expected; did someone else set something?")
+	}
+
+	// Set a few more nodes so we can iterate through them
+	err = yottadb.SetValE(yottadb.NOTTP, nil, "Go Middle Earth", "^hello", []string{"shire"})
+	if err != nil {
+		panic(err)
+	}
+	err = yottadb.SetValE(yottadb.NOTTP, nil, "Go Westeros", "^hello", []string{"Winterfell"})
+	if err != nil {
+		panic(err)
+	}
+
+	var cur_sub = ""
+	for true {
+		cur_sub, err = yottadb.SubNextE(yottadb.NOTTP, nil, "^hello", []string{cur_sub})
+		if err != nil {
+			error_code := yottadb.ErrorCode(err)
+			if error_code == yottadb.YDB_ERR_NODEEND {
+				break
+			} else {
+				panic(err)
+			}
+		}
+		fmt.Printf("%s ", cur_sub)
+	}
+
+}*/

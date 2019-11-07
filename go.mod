@@ -13,4 +13,5 @@ require (
 	google.golang.org/grpc v1.24.0
 	gopkg.in/fatih/pool.v3 v3.0.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
+	lang.yottadb.com/go/yottadb v1.0.0
 )

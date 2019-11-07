@@ -3,8 +3,8 @@ package hsm
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/pruknil/goapp/logger"
 	"gopkg.in/fatih/pool.v3"
-	"log"
 	"net"
 	"time"
 )
@@ -21,10 +21,11 @@ type Config struct {
 type HSMConnection struct {
 	connPool pool.Pool
 	config   Config
+	log      logger.AppLog
 }
 
-func New(cfg Config) *HSMConnection {
-	instance := &HSMConnection{config: cfg}
+func New(cfg Config, log logger.AppLog) *HSMConnection {
+	instance := &HSMConnection{config: cfg, log: log}
 	instance.ping()
 	return instance
 }
@@ -35,7 +36,7 @@ func (h *HSMConnection) ping() {
 		for range ticker.C {
 			if h.connPool != nil {
 			START:
-				fmt.Println("connPool >>", h.connPool.Len())
+				h.log.Trace.Info("connPool >>", h.connPool.Len())
 				c, err := h.connPool.Get()
 				if err == nil && c != nil {
 					err = c.SetDeadline(time.Now().Add(time.Second * 5))
@@ -44,10 +45,10 @@ func (h *HSMConnection) ping() {
 					result := make([]byte, 48)
 					n, err := c.Read(result)
 					if err != nil || n < 4 {
-						log.Printf("read data error: %v, size: %d\n", err, n)
+						h.log.Trace.Infof("read data error: %v, size: %d\n", err, n)
 					}
 					replyHexString := hex.EncodeToString(result)
-					log.Printf("got data: %s\n", replyHexString)
+					h.log.Trace.Infof("got data: %s\n", replyHexString)
 
 					if err != nil {
 						if pc, ok := c.(*pool.PoolConn); ok {

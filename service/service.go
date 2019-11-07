@@ -51,7 +51,7 @@ type HSMService struct {
 	Request  ReqMsg
 	Response ResMsg
 	hsm.IHSMService
-	backendResp *hsm.HSMStatusResponse
+	backendResp *hsm.StatusResponse
 }
 
 func (s *HSMService) getResponse() ResMsg {

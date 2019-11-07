@@ -38,7 +38,7 @@ func (h *HSM) ExecuteMessage(conn net.Conn, hexString string) (string, error) {
 	return body.(string), err
 }
 
-func (h *HSM) CheckStatus() *HSMStatusResponse {
+func (h *HSM) CheckStatus() *StatusResponse {
 	conn, err := h.requestConnection()
 	if err != nil {
 		return nil
@@ -52,7 +52,7 @@ func (h *HSM) CheckStatus() *HSMStatusResponse {
 		return nil
 	}
 	inTextByte := []byte(str)
-	c := &HSMStatusResponse{}
+	c := &StatusResponse{}
 	fixedwidth.Unmarshal(inTextByte, c)
 	return c
 }

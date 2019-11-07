@@ -18,19 +18,19 @@ type Config struct {
 	PoolMin       int
 	PoolMax       int
 }
-type HSMConnection struct {
+type Connection struct {
 	connPool pool.Pool
 	config   Config
 	log      logger.AppLog
 }
 
-func New(cfg Config, log logger.AppLog) *HSMConnection {
-	instance := &HSMConnection{config: cfg, log: log}
+func New(cfg Config, log logger.AppLog) *Connection {
+	instance := &Connection{config: cfg, log: log}
 	instance.ping()
 	return instance
 }
 
-func (h *HSMConnection) ping() {
+func (h *Connection) ping() {
 	t := time.NewTicker(15 * time.Second)
 	go func(ticker *time.Ticker) {
 		for range ticker.C {
@@ -63,7 +63,7 @@ func (h *HSMConnection) ping() {
 	}(t)
 }
 
-func (h *HSMConnection) Open() error {
+func (h *Connection) Open() error {
 	dialer := net.Dialer{Timeout: h.config.ConnTimeout}
 	factory := func() (net.Conn, error) {
 		return dialer.Dial("tcp", fmt.Sprintf("%s:%s", h.config.Host, h.config.Port))
@@ -77,7 +77,7 @@ func (h *HSMConnection) Open() error {
 	return nil
 }
 
-func (h *HSMConnection) requestConnection() (net.Conn, error) {
+func (h *Connection) requestConnection() (net.Conn, error) {
 	if h.connPool == nil {
 		err := h.Open()
 		if err != nil {
@@ -91,7 +91,7 @@ func (h *HSMConnection) requestConnection() (net.Conn, error) {
 	return conn, nil
 }
 
-func (h *HSMConnection) Close() {
+func (h *Connection) Close() {
 	if h.connPool != nil {
 		h.connPool.Close()
 	}

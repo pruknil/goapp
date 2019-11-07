@@ -2,7 +2,6 @@ package logger
 
 import (
 	"github.com/natefinch/lumberjack"
-	"github.com/pruknil/goapp/app"
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -22,8 +21,8 @@ type Logger struct {
 	*logrus.Logger
 }
 
-func New(config app.Config) AppLog {
-	return AppLog{config: config}
+func New() AppLog {
+	return AppLog{}
 }
 func (al *AppLog) NewLog(fileName, lvl string) Logger {
 	return Logger{al.NewLogrus(fileName, lvl)}
@@ -81,10 +80,9 @@ func (f *restFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 
 type AppLog struct {
-	config app.Config
-	Trace  Logger
-	Perf   Logger
-	Error  Logger
-	Rest   Logger
-	Audit  Logger
+	Trace Logger
+	Perf  Logger
+	Error Logger
+	Rest  Logger
+	Audit Logger
 }

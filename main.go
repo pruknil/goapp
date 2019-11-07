@@ -51,7 +51,7 @@ func buildContainer() *dig.Container {
 }
 
 func NewLogger(cfg app.Config) logger.AppLog {
-	al := logger.New(cfg)
+	al := logger.New()
 	al.Error = al.NewLog("error", "info")
 	al.Perf = al.NewLog("perf", "info")
 	al.Trace = al.NewLog("trace", "info")

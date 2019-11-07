@@ -3,8 +3,8 @@ package socket
 import (
 	"bufio"
 	"encoding/hex"
-	"fmt"
 	"github.com/ianlopshire/go-fixedwidth"
+	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/service"
 	"net"
 )
@@ -14,13 +14,15 @@ type Config struct {
 }
 type Socket struct {
 	config  Config
+	log     logger.AppLog
 	service service.ISocketService
 }
 
-func New(cfg Config, sv service.ISocketService) *Socket {
+func New(cfg Config, sv service.ISocketService, log logger.AppLog) *Socket {
 	return &Socket{
 		config:  cfg,
 		service: sv,
+		log:     log,
 	}
 }
 
@@ -28,14 +30,14 @@ func (r *Socket) Start() {
 	go func() {
 		l, err := net.Listen("tcp4", ":"+r.config.Port)
 		if err != nil {
-			fmt.Println(err)
+			r.log.Error.Error(err)
 			return
 		}
 		defer l.Close()
 		for {
 			c, err := l.Accept()
 			if err != nil {
-				fmt.Println(err)
+				r.log.Error.Error(err)
 				return
 			}
 			go r.handleConnection(c)
@@ -44,21 +46,21 @@ func (r *Socket) Start() {
 }
 
 func (r *Socket) Shutdown() {
-	fmt.Println("Socket Shutdown")
+	r.log.Trace.Info("Socket Shutdown")
 }
 
 func (r *Socket) handleConnection(c net.Conn) {
-	fmt.Printf("Serving %s\n", c.RemoteAddr().String())
+	r.log.Trace.Infof("Serving %s\n", c.RemoteAddr().String())
 	for {
 		buf := make([]byte, 64)
 		bufio.NewReader(c).Read(buf)
 
 		raw := hex.EncodeToString(buf)
-		fmt.Println(raw)
-		header := SocketMsg{}
+		r.log.Trace.Debug(raw)
+		header := Msg{}
 		err := fixedwidth.Unmarshal([]byte(hex.EncodeToString(buf)), &header)
 		if err != nil {
-			fmt.Println(err)
+			r.log.Error.Error(err)
 		}
 
 		if header.ResponseHeader == "0000000000" {
@@ -83,7 +85,7 @@ func (r *Socket) handleConnection(c net.Conn) {
 
 	}
 	c.Close()
-	fmt.Println("Disconnect ", c.RemoteAddr().Network())
+	r.log.Trace.Info("Disconnect ", c.RemoteAddr().Network())
 }
 
 func (r *Socket) dispatchService(raw string) []byte {
@@ -92,7 +94,7 @@ func (r *Socket) dispatchService(raw string) []byte {
 	return response.Body.([]byte)
 }
 
-type SocketMsg struct {
+type Msg struct {
 	ResponseHeader string `fixed:"1,10"`
 	ResponseLen    string `fixed:"11,12"`
 	Fn             string `fixed:"13,18"`

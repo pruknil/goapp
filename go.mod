@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/ianlopshire/go-fixedwidth v0.4.6
+	github.com/jinzhu/gorm v1.9.11
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/sirupsen/logrus v1.4.2
 	github.com/sony/gobreaker v0.4.1

@@ -66,10 +66,10 @@ func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
 
-func NewRouter(svc service.IHSMService, socketService service.ISocketService, conf app.Config) []router.IRouter {
+func NewRouter(svc service.IHSMService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
 	var route []router.IRouter
 	route = append(route, http.NewGin(conf.Router.Http, svc))
-	route = append(route, socket.New(conf.Router.Socket, socketService))
+	route = append(route, socket.New(conf.Router.Socket, socketService, log))
 	return route
 }
 

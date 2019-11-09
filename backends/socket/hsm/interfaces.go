@@ -9,5 +9,5 @@ type IConnection interface {
 }
 
 type IHSMService interface {
-	CheckStatus() *StatusResponse
+	CheckStatus() (*StatusResponse, error)
 }

@@ -38,23 +38,29 @@ func (h *HSM) ExecuteMessage(conn net.Conn, hexString string) (string, error) {
 	return body.(string), err
 }
 
-func (h *HSM) CheckStatus() *StatusResponse {
+func (h *HSM) CheckStatus() (*StatusResponse, error) {
 	conn, err := h.requestConnection()
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		conn.Close()
+	}()
+
 	str, err := h.ExecuteMessage(conn, "01010000000101")
 	if err != nil {
 		if pc, ok := conn.(*pool.PoolConn); ok {
 			pc.MarkUnusable()
 		}
-		return nil
+		return nil, err
 	}
 	inTextByte := []byte(str)
 	c := &StatusResponse{}
-	fixedwidth.Unmarshal(inTextByte, c)
-	return c
+	err = fixedwidth.Unmarshal(inTextByte, c)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func (h *HSM) doExecute(conn net.Conn, hexString string) (string, error) {
@@ -78,7 +84,7 @@ func (h *HSM) doExecute(conn net.Conn, hexString string) (string, error) {
 	reply := make([]byte, 512)
 	_, err = conn.Read(reply)
 	if err != nil {
-		return "", fmt.Errorf("Read buffer failed:%s", err.Error())
+		return "", fmt.Errorf("read buffer failed:%s", err.Error())
 	}
 
 	var replyHexString string

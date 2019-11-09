@@ -23,7 +23,7 @@ func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
 	}
 
 	if service.Business() != nil {
-		return ResMsg{}, errors.New("Business Error")
+		return ResMsg{}, errors.New("business error")
 	}
 
 	if service.OutputMapping() != nil {
@@ -80,7 +80,12 @@ func (s *HSMService) InputMapping() error {
 }
 
 func (s *HSMService) Business() error {
-	s.backendResp = s.IHSMService.CheckStatus()
+	var r *hsm.StatusResponse
+	r, err := s.IHSMService.CheckStatus()
+	s.backendResp = r
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/pruknil/goapp/router/socket"
 	"github.com/pruknil/goapp/service"
 	"go.uber.org/dig"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,7 +18,10 @@ import (
 
 func main() {
 	container := buildContainer()
-	invokeContainer(container)
+	err := invokeContainer(container)
+	if err != nil {
+		log.Fatal("Invoke Container error")
+	}
 }
 
 func invokeContainer(container *dig.Container) error {
@@ -34,19 +38,23 @@ func invokeContainer(container *dig.Container) error {
 		}
 	})
 }
-
+func errorWrap(err error) {
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+}
 func buildContainer() *dig.Container {
 	container := dig.New()
-	container.Provide(NewConfig)
-	container.Provide(NewLogger)
+	errorWrap(container.Provide(NewConfig))
+	errorWrap(container.Provide(NewLogger))
 
-	container.Provide(NewHSMConn)
+	errorWrap(container.Provide(NewHSMConn))
 
-	container.Provide(NewService)
-	container.Provide(NewSocketService)
+	errorWrap(container.Provide(NewService))
+	errorWrap(container.Provide(NewSocketService))
 
-	container.Provide(NewHSM)
-	container.Provide(NewRouter)
+	errorWrap(container.Provide(NewHSM))
+	errorWrap(container.Provide(NewRouter))
 	return container
 }
 

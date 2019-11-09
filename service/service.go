@@ -15,7 +15,7 @@ func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
 	}(time.Now())
 	service.setRequest(req)
 	if service.Validate() != nil {
-		return ResMsg{}, errors.New("Validate Error")
+		return ResMsg{}, errors.New("validate error")
 	}
 
 	if service.InputMapping() != nil {

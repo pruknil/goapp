@@ -58,7 +58,7 @@ func buildContainer() *dig.Container {
 	return container
 }
 
-func NewLogger(cfg app.Config) logger.AppLog {
+func NewLogger() logger.AppLog {
 	al := logger.New()
 	al.Error = al.NewLog("error", "info")
 	al.Perf = al.NewLog("perf", "info")
@@ -90,8 +90,8 @@ func NewSocketService() service.ISocketService {
 }
 
 func NewConfig() app.Config {
-	fiveSec, _ := time.ParseDuration("5s")
-	tenSec, _ := time.ParseDuration("10s")
+	five, _ := time.ParseDuration("5s")
+	ten, _ := time.ParseDuration("10s")
 	return app.Config{
 		Backend: app.Backend{
 			Hsm: hsm.Config{
@@ -99,9 +99,9 @@ func NewConfig() app.Config {
 				//Port:          "2048",
 				Host:          "localhost",
 				Port:          "1111",
-				ConnTimeout:   fiveSec,
-				ReadDeadline:  fiveSec,
-				WriteDeadline: fiveSec,
+				ConnTimeout:   five,
+				ReadDeadline:  five,
+				WriteDeadline: five,
 				PoolMin:       5,
 				PoolMax:       5,
 			},
@@ -109,9 +109,9 @@ func NewConfig() app.Config {
 		Router: app.Router{
 			Http: http.Config{
 				Port:         "8080",
-				ReadTimeout:  tenSec,
-				WriteTimeout: tenSec,
-				IdleTimeout:  tenSec,
+				ReadTimeout:  ten,
+				WriteTimeout: ten,
+				IdleTimeout:  ten,
 			},
 			Socket: socket.Config{
 				Port: "1111",

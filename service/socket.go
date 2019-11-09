@@ -42,7 +42,7 @@ func (s *SocketService) InputMapping() error {
 
 func (s *SocketService) Business() error {
 	by, _ := hex.DecodeString("01010000001d0100000000000000000000030000002a000001a6084d3039393939394500000000000000000000000000")
-	s.backendResp = []byte(by)
+	s.backendResp = by
 	return nil
 }
 

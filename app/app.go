@@ -1,6 +1,7 @@
 package app
 
 import (
+	http2 "github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/router/http"
 	"github.com/pruknil/goapp/router/socket"
@@ -17,5 +18,6 @@ type Router struct {
 }
 
 type Backend struct {
-	Hsm hsm.Config
+	Hsm  hsm.Config
+	Http http2.Config
 }

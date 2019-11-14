@@ -1,41 +1,36 @@
 package http
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
+	breaker "github.com/sony/gobreaker"
 	"io/ioutil"
 	"net/http"
 )
 
-const baseURL string = "https://www.myservice.com/v1"
+const baseURL string = "https://website-api.airvisual.com/v1/places/map?bbox=100.1972940089172,13.47902387099105,100.78038479108272,13.979292336476917&units.temperature=celsius&units.distance=kilometer&AQI=US&language=th"
 
 type Client struct {
 	Username string
 	Password string
+	*breaker.CircuitBreaker
+	Config
 }
 
-func NewBasicAuthClient(username, password string) *Client {
-	return &Client{
-		Username: username,
-		Password: password,
+func New(c Config) IHTTPService {
+	var st breaker.Settings
+	st.Name = "HTTP"
+	st.Timeout = 3
+	st.ReadyToTrip = func(counts breaker.Counts) bool {
+		failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+		return counts.Requests >= 3 && failureRatio >= 0.6
 	}
+	cb := breaker.NewCircuitBreaker(st)
+	return &Client{CircuitBreaker: cb, Config: c}
 }
 
-func (s *Client) AddTodo(todo *ReqMsg) error {
-	url := fmt.Sprintf(baseURL+"/%s/todos", s.Username)
-	fmt.Println(url)
-	j, err := json.Marshal(todo)
-	if err != nil {
-		return err
-	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(j))
-	if err != nil {
-		return err
-	}
-	_, err = s.doRequest(req)
-	return err
+type Config struct {
 }
+
 func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	req.SetBasicAuth(s.Username, s.Password)
 	client := &http.Client{}
@@ -48,25 +43,8 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if 200 != resp.StatusCode {
+	if http.StatusOK != resp.StatusCode {
 		return nil, fmt.Errorf("%s", body)
 	}
 	return body, nil
-}
-func (s *Client) GetTodo(id int) (*ResMsg, error) {
-	url := fmt.Sprintf(baseURL+"/%s/todos/%d", s.Username, id)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	bytes, err := s.doRequest(req)
-	if err != nil {
-		return nil, err
-	}
-	var data ResMsg
-	err = json.Unmarshal(bytes, &data)
-	if err != nil {
-		return nil, err
-	}
-	return &data, nil
 }

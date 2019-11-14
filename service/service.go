@@ -2,12 +2,22 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"log"
 	"time"
 )
 
 //type commonFn func() error
+type IServiceTemplate interface {
+	Validate() error
+	OutputMapping() error
+	InputMapping() error
+	Business() error
+	setRequest(ReqMsg) error
+	getResponse() ResMsg
+}
 
 func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
 	defer func(s time.Time) {
@@ -37,20 +47,12 @@ type IHSMService interface {
 	HSMStatus(ReqMsg) ResMsg
 }
 
-type IServiceTemplate interface {
-	Validate() error
-	OutputMapping() error
-	InputMapping() error
-	Business() error
-	setRequest(ReqMsg) error
-	getResponse() ResMsg
-}
-
 type HSMService struct {
 	IServiceTemplate
 	Request  ReqMsg
 	Response ResMsg
 	hsm.IHSMService
+	http.IHTTPService
 	backendResp *hsm.StatusResponse
 }
 
@@ -83,6 +85,9 @@ func (s *HSMService) Business() error {
 	var r *hsm.StatusResponse
 	r, err := s.IHSMService.CheckStatus()
 	s.backendResp = r
+
+	x, err := s.IHTTPService.CheckStatus()
+	fmt.Println(x)
 	if err != nil {
 		return err
 	}

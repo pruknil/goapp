@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/pruknil/goapp/app"
+	http2 "github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router"
@@ -54,6 +55,8 @@ func buildContainer() *dig.Container {
 	errorWrap(container.Provide(NewSocketService))
 
 	errorWrap(container.Provide(NewHSM))
+	errorWrap(container.Provide(NewHttp))
+
 	errorWrap(container.Provide(NewRouter))
 	return container
 }
@@ -73,16 +76,19 @@ func NewHSMConn(cfg app.Config, log logger.AppLog) hsm.IConnection {
 func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
+func NewHttp(cfg app.Config) http2.IHTTPService {
+	return http2.New(cfg.Backend.Http)
+}
 
-func NewRouter(svc service.IHSMService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
+func NewRouter(hsm service.IHSMService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
 	var route []router.IRouter
-	route = append(route, http.NewGin(conf.Router.Http, svc))
+	route = append(route, http.NewGin(conf.Router.Http, hsm))
 	route = append(route, socket.New(conf.Router.Socket, socketService, log))
 	return route
 }
 
-func NewService(h hsm.IHSMService) service.IHSMService {
-	return &service.HSMService{IHSMService: h}
+func NewService(h hsm.IHSMService, ht http2.IHTTPService) service.IHSMService {
+	return &service.HSMService{IHSMService: h, IHTTPService: ht}
 }
 
 func NewSocketService() service.ISocketService {

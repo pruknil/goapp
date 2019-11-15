@@ -51,7 +51,7 @@ func buildContainer() *dig.Container {
 
 	errorWrap(container.Provide(NewHSMConn))
 
-	errorWrap(container.Provide(NewService))
+	errorWrap(container.Provide(NewHttpService))
 	errorWrap(container.Provide(NewSocketService))
 
 	errorWrap(container.Provide(NewHSM))
@@ -69,6 +69,7 @@ func NewLogger() logger.AppLog {
 	return al
 }
 
+//================= Start BACKEND Section =================
 func NewHSMConn(cfg app.Config, log logger.AppLog) hsm.IConnection {
 	return hsm.New(cfg.Hsm, log)
 }
@@ -76,10 +77,12 @@ func NewHSMConn(cfg app.Config, log logger.AppLog) hsm.IConnection {
 func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
+
 func NewHttp(cfg app.Config) http2.IHTTPService {
 	return http2.New(cfg.Backend.Http)
 }
 
+//================= End BACKEND Section =================
 func NewRouter(hsm service.IHSMService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
 	var route []router.IRouter
 	route = append(route, http.NewGin(conf.Router.Http, hsm))
@@ -87,7 +90,7 @@ func NewRouter(hsm service.IHSMService, socketService service.ISocketService, co
 	return route
 }
 
-func NewService(h hsm.IHSMService, ht http2.IHTTPService) service.IHSMService {
+func NewHttpService(h hsm.IHSMService, ht http2.IHTTPService) service.IHSMService {
 	return &service.HSMService{IHSMService: h, IHTTPService: ht}
 }
 

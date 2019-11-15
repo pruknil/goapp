@@ -1,68 +1,22 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
-	"log"
-	"time"
 )
 
 //type commonFn func() error
-type IServiceTemplate interface {
-	Validate() error
-	OutputMapping() error
-	InputMapping() error
-	Business() error
-	setRequest(ReqMsg) error
-	getResponse() ResMsg
-}
-
-func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
-	defer func(s time.Time) {
-		log.Printf("elpased time %0.2d ns", time.Since(s).Nanoseconds())
-	}(time.Now())
-	service.setRequest(req)
-	if service.Validate() != nil {
-		return ResMsg{}, errors.New("validate error")
-	}
-
-	if service.InputMapping() != nil {
-		return ResMsg{}, errors.New("InputMapping Error")
-	}
-
-	if service.Business() != nil {
-		return ResMsg{}, errors.New("business error")
-	}
-
-	if service.OutputMapping() != nil {
-		return ResMsg{}, errors.New("OutputMapping Error")
-	}
-
-	return service.getResponse(), nil
-}
 
 type IHSMService interface {
 	HSMStatus(ReqMsg) ResMsg
 }
 
 type HSMService struct {
-	IServiceTemplate
-	Request  ReqMsg
-	Response ResMsg
+	baseService
 	hsm.IHSMService
 	http.IHTTPService
 	backendResp *hsm.StatusResponse
-}
-
-func (s *HSMService) getResponse() ResMsg {
-	return s.Response
-}
-
-func (s *HSMService) setRequest(r ReqMsg) error {
-	s.Request = r
-	return nil
 }
 
 func (s *HSMService) Validate() error {

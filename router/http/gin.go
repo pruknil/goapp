@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"fmt"
 	"github.com/pruknil/goapp/service"
 	"log"
 	"net/http"
@@ -40,29 +41,61 @@ func (g *Gin) initializeRoutes() {
 }
 
 func (g *Gin) serviceLocator(c *gin.Context) {
-	var u service.ReqMsg
-	c.BindJSON(&u)
-	//r := service.ResMsg{}
-
-	route, ok := g.routes[u.Header.FuncNm]
+	var reqMsg service.ReqMsg
+	c.BindJSON(&reqMsg)
+	route, ok := g.routes[reqMsg.Header.FuncNm]
 	if !ok {
 		c.JSON(http.StatusNotFound, gin.H{"error": "notfound"})
 		return
 	}
-	ele := reflect.ValueOf(route).Elem()
-	ele.FieldByName("Request").Set(reflect.ValueOf(u))
-	//ele.FieldByName("Response").Set(reflect.ValueOf(r))
-	ele.MethodByName(u.Header.FuncNm).Call([]reflect.Value{})
+	a, err := invoke(route, reqMsg.Header.FuncNm, reqMsg)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, a.Interface().(service.ResMsg))
 }
+func invoke(any interface{}, name string, args ...interface{}) (reflect.Value, error) {
+	method := reflect.ValueOf(any).MethodByName(name)
+	methodType := method.Type()
+	numIn := methodType.NumIn()
+	if numIn > len(args) {
+		return reflect.ValueOf(nil), fmt.Errorf("Method %s must have minimum %d params. Have %d", name, numIn, len(args))
+	}
+	if numIn != len(args) && !methodType.IsVariadic() {
+		return reflect.ValueOf(nil), fmt.Errorf("Method %s must have %d params. Have %d", name, numIn, len(args))
+	}
+	in := make([]reflect.Value, len(args))
+	for i := 0; i < len(args); i++ {
+		var inType reflect.Type
+		if methodType.IsVariadic() && i >= numIn-1 {
+			inType = methodType.In(numIn - 1).Elem()
+		} else {
+			inType = methodType.In(i)
+		}
+		argValue := reflect.ValueOf(args[i])
+		if !argValue.IsValid() {
+			return reflect.ValueOf(nil), fmt.Errorf("Method %s. Param[%d] must be %s. Have %s", name, i, inType, argValue.String())
+		}
+		argType := argValue.Type()
+		if argType.ConvertibleTo(inType) {
+			in[i] = argValue.Convert(inType)
+		} else {
+			return reflect.ValueOf(nil), fmt.Errorf("Method %s. Param[%d] must be %s. Have %s", name, i, inType, argType)
+		}
+	}
+	return method.Call(in)[0], nil
+}
+
 func (g *Gin) register(route string, controller interface{}) {
 	g.routes[route] = controller
 }
 
-func (g *Gin) callHsm(c *gin.Context) {
-	var u service.ReqMsg
-	c.BindJSON(&u)
-	c.JSON(http.StatusOK, g.httpService.HSMStatus(u))
-}
+//func (g *Gin) callHsm(c *gin.Context) {
+//	var u service.ReqMsg
+//	c.BindJSON(&u)
+//	c.JSON(http.StatusOK, g.httpService.HSMStatus(u))
+//}
 
 func (g *Gin) Start() {
 	g.router = gin.Default()

@@ -9,19 +9,8 @@ type ISocketService interface {
 }
 
 type SocketService struct {
-	IServiceTemplate
-	Request     ReqMsg
-	Response    ResMsg
+	baseService
 	backendResp []byte
-}
-
-func (s *SocketService) getResponse() ResMsg {
-	return s.Response
-}
-
-func (s *SocketService) setRequest(r ReqMsg) error {
-	s.Request = r
-	return nil
 }
 
 func (s *SocketService) Validate() error {
@@ -48,7 +37,7 @@ func (s *SocketService) Business() error {
 
 func (s *SocketService) HSMFunc01(req ReqMsg) ResMsg {
 
-	r, _ := DoService(req, s)
+	r, _ := s.DoService(req, s)
 	//if err != nil {
 	//	return "Doservice Error"
 	//}

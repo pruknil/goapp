@@ -18,16 +18,16 @@ type Config struct {
 }
 
 type Gin struct {
-	srv    *http.Server
-	config Config
-	hsm    service.IHSMService
-	router *gin.Engine
+	srv         *http.Server
+	config      Config
+	httpService service.IHttpService
+	router      *gin.Engine
 }
 
-func NewGin(cfg Config, sv service.IHSMService) *Gin {
+func NewGin(cfg Config, service service.IHttpService) *Gin {
 	return &Gin{
-		config: cfg,
-		hsm:    sv,
+		config:      cfg,
+		httpService: service,
 	}
 }
 
@@ -38,7 +38,7 @@ func (g *Gin) initializeRoutes() {
 func (g *Gin) callHsm(c *gin.Context) {
 	var u service.ReqMsg
 	c.BindJSON(&u)
-	c.JSON(http.StatusOK, g.hsm.HSMStatus(u))
+	c.JSON(http.StatusOK, g.httpService.HSMStatus(u))
 }
 
 func (g *Gin) Start() {

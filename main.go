@@ -83,15 +83,15 @@ func NewHttp(cfg app.Config) http2.IHTTPService {
 }
 
 //================= End BACKEND Section =================
-func NewRouter(hsm service.IHSMService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
+func NewRouter(hsm service.IHttpService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
 	var route []router.IRouter
 	route = append(route, http.NewGin(conf.Router.Http, hsm))
 	route = append(route, socket.New(conf.Router.Socket, socketService, log))
 	return route
 }
 
-func NewHttpService(h hsm.IHSMService, ht http2.IHTTPService) service.IHSMService {
-	return &service.HSMService{IHSMService: h, IHTTPService: ht}
+func NewHttpService(h hsm.IHSMService, ht http2.IHTTPService) service.IHttpService {
+	return &service.HttpService{IHSMService: h, IHTTPService: ht}
 }
 
 func NewSocketService() service.ISocketService {

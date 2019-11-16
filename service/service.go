@@ -8,22 +8,22 @@ import (
 
 //type commonFn func() error
 
-type IHSMService interface {
+type IHttpService interface {
 	HSMStatus(ReqMsg) ResMsg
 }
 
-type HSMService struct {
+type HttpService struct {
 	baseService
 	hsm.IHSMService
 	http.IHTTPService
 	backendResp *hsm.StatusResponse
 }
 
-func (s *HSMService) Validate() error {
+func (s *HttpService) Validate() error {
 	return nil
 }
 
-func (s *HSMService) OutputMapping() error {
+func (s *HttpService) OutputMapping() error {
 	s.Response = ResMsg{
 		Header: ResHeader{},
 		Body:   s.backendResp,
@@ -31,11 +31,11 @@ func (s *HSMService) OutputMapping() error {
 	return nil
 }
 
-func (s *HSMService) InputMapping() error {
+func (s *HttpService) InputMapping() error {
 	return nil
 }
 
-func (s *HSMService) Business() error {
+func (s *HttpService) Business() error {
 	var r *hsm.StatusResponse
 	r, err := s.IHSMService.CheckStatus()
 	s.backendResp = r
@@ -48,9 +48,9 @@ func (s *HSMService) Business() error {
 	return nil
 }
 
-func (s *HSMService) HSMStatus(req ReqMsg) ResMsg {
+func (s *HttpService) HSMStatus(req ReqMsg) ResMsg {
 
-	r, _ := DoService(req, s)
+	r, _ := s.DoService(req, s)
 	//if err != nil {
 	//	return "Doservice Error"
 	//}

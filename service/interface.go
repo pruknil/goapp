@@ -33,7 +33,11 @@ func (s *baseService) Validate() error {
 	return nil
 }
 
-func DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
+type ABroker interface {
+	DoService(ReqMsg, IServiceTemplate) (ResMsg, error)
+}
+
+func (s *baseService) DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error) {
 	defer func(s time.Time) {
 		log.Printf("elpased time %0.2d ns", time.Since(s).Nanoseconds())
 	}(time.Now())

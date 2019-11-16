@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 )
@@ -16,9 +15,10 @@ type HttpService struct {
 	baseService
 	hsm.IHSMService
 	http.IHTTPService
-	backendResp *hsm.StatusResponse
+	//backendResp *hsm.StatusResponse
 }
 
+/*
 func (s *HttpService) Validate() error {
 	return nil
 }
@@ -46,11 +46,16 @@ func (s *HttpService) Business() error {
 		return err
 	}
 	return nil
-}
+}*/
 
 func (s *HttpService) HSMStatus(req ReqMsg) ResMsg {
-
-	r, _ := s.DoService(req, s)
+	ee := &ExampleService{
+		baseService:  s.baseService,
+		IHTTPService: s.IHTTPService,
+		IHSMService:  s.IHSMService,
+	}
+	r, _ := ee.DoService(req, ee)
+	//r, _ := s.DoService(req, s)
 	//if err != nil {
 	//	return "Doservice Error"
 	//}

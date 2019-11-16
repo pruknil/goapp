@@ -5,6 +5,7 @@ import (
 	"github.com/pruknil/goapp/service"
 	"log"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,17 +23,39 @@ type Gin struct {
 	config      Config
 	httpService service.IHttpService
 	router      *gin.Engine
+	routes      map[string]interface{}
 }
 
 func NewGin(cfg Config, service service.IHttpService) *Gin {
 	return &Gin{
 		config:      cfg,
 		httpService: service,
+		routes:      make(map[string]interface{}),
 	}
 }
 
 func (g *Gin) initializeRoutes() {
-	g.router.POST("/hsm", g.callHsm)
+	g.register("HSMStatus", g.httpService)
+	g.router.POST("/hsm", g.serviceLocator)
+}
+
+func (g *Gin) serviceLocator(c *gin.Context) {
+	var u service.ReqMsg
+	c.BindJSON(&u)
+	//r := service.ResMsg{}
+
+	route, ok := g.routes[u.Header.FuncNm]
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "notfound"})
+		return
+	}
+	ele := reflect.ValueOf(route).Elem()
+	ele.FieldByName("Request").Set(reflect.ValueOf(u))
+	//ele.FieldByName("Response").Set(reflect.ValueOf(r))
+	ele.MethodByName(u.Header.FuncNm).Call([]reflect.Value{})
+}
+func (g *Gin) register(route string, controller interface{}) {
+	g.routes[route] = controller
 }
 
 func (g *Gin) callHsm(c *gin.Context) {

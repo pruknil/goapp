@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/pruknil/goapp/app"
-	http2 "github.com/pruknil/goapp/backends/http"
+	behttp "github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router"
@@ -78,22 +78,26 @@ func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
 
-func NewHttp(cfg app.Config) http2.IHTTPService {
-	return http2.New(cfg.Backend.Http)
+func NewHttp(cfg app.Config) behttp.IHTTPService {
+	return behttp.New(cfg.Backend.Http)
 }
 
 //================= End BACKEND Section =================
-func NewRouter(hsm service.IHttpService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
+
+//Create all router here eg.. rest, socket, mq
+func NewRouter(httpService service.IHttpService, socketService service.ISocketService, conf app.Config, log logger.AppLog) []router.IRouter {
 	var route []router.IRouter
-	route = append(route, http.NewGin(conf.Router.Http, hsm))
+	route = append(route, http.NewGin(conf.Router.Http, httpService))
 	route = append(route, socket.New(conf.Router.Socket, socketService, log))
 	return route
 }
 
-func NewHttpService(h hsm.IHSMService, ht http2.IHTTPService) service.IHttpService {
-	return &service.HttpService{IHSMService: h, IHTTPService: ht}
+//Http service
+func NewHttpService(hsmService hsm.IHSMService, httpService behttp.IHTTPService) service.IHttpService {
+	return &service.HttpService{IHSMService: hsmService, IHTTPService: httpService}
 }
 
+//Socket service
 func NewSocketService() service.ISocketService {
 	return &service.SocketService{}
 }

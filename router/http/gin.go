@@ -2,11 +2,9 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"github.com/pruknil/goapp/service"
 	"log"
 	"net/http"
-	"reflect"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,55 +34,27 @@ func NewGin(cfg Config, service service.IHttpService) *Gin {
 }
 
 func (g *Gin) initializeRoutes() {
-	g.register("HSMStatus", g.httpService)
+	g.register("AQIStatus", g.httpService)
 	g.router.POST("/hsm", g.serviceLocator)
 }
 
 func (g *Gin) serviceLocator(c *gin.Context) {
 	var reqMsg service.ReqMsg
 	c.BindJSON(&reqMsg)
-	route, ok := g.routes[reqMsg.Header.FuncNm]
-	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{"error": "notfound"})
-		return
-	}
-	a, err := invoke(route, reqMsg.Header.FuncNm, reqMsg)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, a.Interface().(service.ResMsg))
-}
-func invoke(any interface{}, name string, args ...interface{}) (reflect.Value, error) {
-	method := reflect.ValueOf(any).MethodByName(name)
-	methodType := method.Type()
-	numIn := methodType.NumIn()
-	if numIn > len(args) {
-		return reflect.ValueOf(nil), fmt.Errorf("Method %s must have minimum %d params. Have %d", name, numIn, len(args))
-	}
-	if numIn != len(args) && !methodType.IsVariadic() {
-		return reflect.ValueOf(nil), fmt.Errorf("Method %s must have %d params. Have %d", name, numIn, len(args))
-	}
-	in := make([]reflect.Value, len(args))
-	for i := 0; i < len(args); i++ {
-		var inType reflect.Type
-		if methodType.IsVariadic() && i >= numIn-1 {
-			inType = methodType.In(numIn - 1).Elem()
-		} else {
-			inType = methodType.In(i)
+	/*
+		route, ok := g.routes[reqMsg.Header.FuncNm]
+		if !ok {
+			c.JSON(http.StatusNotFound, gin.H{"error": "notfound"})
+			return
 		}
-		argValue := reflect.ValueOf(args[i])
-		if !argValue.IsValid() {
-			return reflect.ValueOf(nil), fmt.Errorf("Method %s. Param[%d] must be %s. Have %s", name, i, inType, argValue.String())
+		a, err := invoke(route, reqMsg.Header.FuncNm, reqMsg)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
 		}
-		argType := argValue.Type()
-		if argType.ConvertibleTo(inType) {
-			in[i] = argValue.Convert(inType)
-		} else {
-			return reflect.ValueOf(nil), fmt.Errorf("Method %s. Param[%d] must be %s. Have %s", name, i, inType, argType)
-		}
-	}
-	return method.Call(in)[0], nil
+		c.JSON(http.StatusOK, a.Interface().(service.ResMsg))
+	*/
+	c.JSON(http.StatusOK, g.httpService.HSMStatus(reqMsg))
 }
 
 func (g *Gin) register(route string, controller interface{}) {

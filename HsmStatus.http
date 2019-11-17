@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "Header":{
-    "funcNm": "HSMStatus",
+    "funcNm": "AQIStatus",
     "rqUID": "",
     "rqDt": "",
     "rqAppId": "123",

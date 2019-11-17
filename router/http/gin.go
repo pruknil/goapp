@@ -22,19 +22,16 @@ type Gin struct {
 	config      Config
 	httpService service.IHttpService
 	router      *gin.Engine
-	routes      map[string]interface{}
 }
 
 func NewGin(cfg Config, service service.IHttpService) *Gin {
 	return &Gin{
 		config:      cfg,
 		httpService: service,
-		routes:      make(map[string]interface{}),
 	}
 }
 
 func (g *Gin) initializeRoutes() {
-	g.register("AQIStatus", g.httpService)
 	g.router.POST("/hsm", g.serviceLocator)
 }
 
@@ -55,10 +52,6 @@ func (g *Gin) serviceLocator(c *gin.Context) {
 		c.JSON(http.StatusOK, a.Interface().(service.ResMsg))
 	*/
 	c.JSON(http.StatusOK, g.httpService.HSMStatus(reqMsg))
-}
-
-func (g *Gin) register(route string, controller interface{}) {
-	g.routes[route] = controller
 }
 
 //func (g *Gin) callHsm(c *gin.Context) {

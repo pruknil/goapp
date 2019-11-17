@@ -94,7 +94,12 @@ func NewRouter(httpService service.IHttpService, socketService service.ISocketSe
 
 //Http service
 func NewHttpService(hsmService hsm.IHSMService, httpService behttp.IHTTPService) service.IHttpService {
-	return &service.HttpService{IHSMService: hsmService, IHTTPService: httpService}
+	routes := make(map[string]interface{})
+	routes["ExampleService"] = service.ExampleService{
+		IHTTPService: httpService,
+		IHSMService:  hsmService,
+	}
+	return &service.HttpService{IHSMService: hsmService, IHTTPService: httpService, Routes: routes}
 }
 
 //Socket service

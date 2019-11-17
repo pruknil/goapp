@@ -17,6 +17,7 @@ type HttpService struct {
 	baseService
 	hsm.IHSMService
 	http.IHTTPService
+	Routes map[string]interface{}
 	//backendResp *hsm.StatusResponse
 }
 
@@ -51,12 +52,17 @@ func (s *HttpService) Business() error {
 }*/
 
 func (s *HttpService) HSMStatus(req ReqMsg) ResMsg {
-	ee := &ExampleService{
-		baseService:  s.baseService,
-		IHTTPService: s.IHTTPService,
-		IHSMService:  s.IHSMService,
+	route, ok := s.Routes[req.Header.FuncNm]
+	if !ok {
+		fmt.Println("notfound")
 	}
-	r, _ := ee.DoService(req, ee)
+	//ee := &ExampleService{
+	//	baseService:  s.baseService,
+	//	IHTTPService: s.IHTTPService,
+	//	IHSMService:  s.IHSMService,
+	//}
+	ee := route.(ExampleService)
+	r, _ := ee.DoService(req, &ee)
 	//r, _ := s.DoService(req, s)
 	//if err != nil {
 	//	return "Doservice Error"

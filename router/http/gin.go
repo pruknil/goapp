@@ -51,7 +51,7 @@ func (g *Gin) serviceLocator(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, a.Interface().(service.ResMsg))
 	*/
-	c.JSON(http.StatusOK, g.httpService.HSMStatus(reqMsg))
+	c.JSON(http.StatusOK, g.httpService.DoService(reqMsg))
 }
 
 //func (g *Gin) callHsm(c *gin.Context) {

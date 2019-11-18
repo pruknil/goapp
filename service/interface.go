@@ -13,6 +13,7 @@ type IServiceTemplate interface {
 	Business() error
 	setRequest(ReqMsg) error
 	getResponse() ResMsg
+	DoService(req ReqMsg, service IServiceTemplate) (ResMsg, error)
 }
 
 type baseService struct {

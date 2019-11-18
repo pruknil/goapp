@@ -3,11 +3,13 @@ package app
 import (
 	http2 "github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
+	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router/http"
 	"github.com/pruknil/goapp/router/socket"
 )
 
 type Config struct {
+	logger.AppLog
 	Backend
 	Router
 }

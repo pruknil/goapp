@@ -32,33 +32,18 @@ func NewGin(cfg Config, service service.IHttpService) *Gin {
 }
 
 func (g *Gin) initializeRoutes() {
-	g.router.POST("/hsm", g.serviceLocator)
+	g.router.POST("/api", g.serviceLocator)
 }
 
 func (g *Gin) serviceLocator(c *gin.Context) {
 	var reqMsg service.ReqMsg
-	c.BindJSON(&reqMsg)
-	/*
-		route, ok := g.routes[reqMsg.Header.FuncNm]
-		if !ok {
-			c.JSON(http.StatusNotFound, gin.H{"error": "notfound"})
-			return
-		}
-		a, err := invoke(route, reqMsg.Header.FuncNm, reqMsg)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, a.Interface().(service.ResMsg))
-	*/
+	err := c.BindJSON(&reqMsg)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, g.httpService.DoService(reqMsg))
 }
-
-//func (g *Gin) callHsm(c *gin.Context) {
-//	var u service.ReqMsg
-//	c.BindJSON(&u)
-//	c.JSON(http.StatusOK, g.httpService.HSMStatus(u))
-//}
 
 func (g *Gin) Start() {
 	g.router = gin.Default()

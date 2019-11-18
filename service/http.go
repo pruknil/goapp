@@ -32,3 +32,30 @@ func (s *ExampleService) Business() error {
 	}
 	return nil
 }
+
+type HsmService struct {
+	baseService
+	hsm.IHSMService
+	backendResp *hsm.StatusResponse
+}
+
+func (s *HsmService) OutputMapping() error {
+	s.Response = ResMsg{
+		Header: ResHeader{},
+		Body:   s.backendResp,
+	}
+	return nil
+}
+
+func (s *HsmService) InputMapping() error {
+	return nil
+}
+
+func (s *HsmService) Business() error {
+	x, err := s.IHSMService.CheckStatus()
+	if err != nil {
+		return err
+	}
+	s.backendResp = x
+	return nil
+}

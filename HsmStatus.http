@@ -13,3 +13,17 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:8080/hsm
+Content-Type: application/json
+
+{
+  "Header": {
+    "funcNm": "HsmService",
+    "rqUID": "",
+    "rqDt": "",
+    "rqAppId": "123",
+    "userLangPref": "th"
+  }
+}
+
+###

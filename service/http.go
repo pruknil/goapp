@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"github.com/pruknil/goapp/backends/http"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 )
@@ -57,5 +58,35 @@ func (s *HsmService) Business() error {
 		return err
 	}
 	s.backendResp = x
+	return nil
+}
+
+type KPeopleService struct {
+	baseService
+	http.IHTTPService
+	backendResp *http.KPeopleRes
+}
+
+func (s *KPeopleService) OutputMapping() error {
+	s.Response = ResMsg{
+		Header: ResHeader{},
+		Body:   s.backendResp,
+	}
+	return nil
+}
+
+func (s *KPeopleService) InputMapping() error {
+	return nil
+}
+
+func (s *KPeopleService) Business() error {
+	peopleReq := http.KPeopleReq{}
+	jsonString, _ := json.Marshal(s.Request.Body)
+	json.Unmarshal(jsonString, &peopleReq)
+	res, err := s.IHTTPService.KPeopleGetData(peopleReq)
+	s.backendResp = res
+	if err != nil {
+		return err
+	}
 	return nil
 }

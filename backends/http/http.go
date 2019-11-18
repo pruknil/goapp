@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-const baseURL string = "https://website-api.airvisual.com/v1/places/map?bbox=100.1972940089172,13.47902387099105,100.78038479108272,13.979292336476917&units.temperature=celsius&units.distance=kilometer&AQI=US&language=th"
-
 type Client struct {
 	Username string
 	Password string

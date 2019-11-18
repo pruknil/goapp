@@ -1,5 +1,5 @@
 ### Send POST request with json body
-POST http://localhost:8080/hsm
+POST http://localhost:8080/api
 Content-Type: application/json
 
 {
@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:8080/hsm
+POST http://localhost:8080/api
 Content-Type: application/json
 
 {
@@ -23,6 +23,24 @@ Content-Type: application/json
     "rqDt": "",
     "rqAppId": "123",
     "userLangPref": "th"
+  }
+}
+
+###
+POST http://localhost:8080/api
+Content-Type: application/json
+
+{
+  "Header": {
+    "funcNm": "KPeopleService",
+    "rqUID": "",
+    "rqDt": "",
+    "rqAppId": "123",
+    "userLangPref": "th"
+  },
+  "Body": {
+    "EMP_ID": "965150",
+    "CO_TP_CD": "KSOFT"
   }
 }
 

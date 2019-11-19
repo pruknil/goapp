@@ -2,8 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/pruknil/goapp/backends/http"
-	"github.com/pruknil/goapp/backends/socket/hsm"
 )
 
 //type commonFn func() error
@@ -14,8 +12,6 @@ type IHttpService interface {
 
 type HttpService struct {
 	baseService
-	hsm.IHSMService
-	http.IHTTPService
 	Routes map[string]IServiceTemplate
 }
 
@@ -24,7 +20,6 @@ func (s *HttpService) DoService(req ReqMsg) ResMsg {
 	if !ok {
 		fmt.Println("notfound")
 	}
-
 	r, _ := route.DoService(req, route)
 	//r, _ := s.DoService(req, s)
 	//if err != nil {

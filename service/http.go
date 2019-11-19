@@ -64,27 +64,27 @@ func (s *HsmService) Business() error {
 type KPeopleService struct {
 	baseService
 	http.IHTTPService
-	backendResp *http.KPeopleRes
+	backendReq http.KPeopleReq
+	backendRes *http.KPeopleRes
 }
 
 func (s *KPeopleService) OutputMapping() error {
 	s.Response = ResMsg{
 		Header: ResHeader{},
-		Body:   s.backendResp,
+		Body:   s.backendRes,
 	}
 	return nil
 }
 
 func (s *KPeopleService) InputMapping() error {
+	jsonString, _ := json.Marshal(s.Request.Body)
+	json.Unmarshal(jsonString, &s.backendReq)
 	return nil
 }
 
 func (s *KPeopleService) Business() error {
-	peopleReq := http.KPeopleReq{}
-	jsonString, _ := json.Marshal(s.Request.Body)
-	json.Unmarshal(jsonString, &peopleReq)
-	res, err := s.IHTTPService.KPeopleGetData(peopleReq)
-	s.backendResp = res
+	res, err := s.IHTTPService.KPeopleGetData(s.backendReq)
+	s.backendRes = res
 	if err != nil {
 		return err
 	}

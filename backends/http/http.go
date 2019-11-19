@@ -41,6 +41,7 @@ func (s *Client) doRequest(req *http.Request) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("response Body:", string(body))
 	if http.StatusOK != resp.StatusCode {
 		return nil, fmt.Errorf("%s", body)
 	}

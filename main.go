@@ -98,6 +98,7 @@ func NewHttpService(hsmService hsm.IHSMService, httpService behttp.IHTTPService)
 	routes["ExampleService"] = &service.ExampleService{IHTTPService: httpService, IHSMService: hsmService}
 	routes["KPeopleService"] = &service.KPeopleService{IHTTPService: httpService}
 	routes["HsmService"] = &service.HsmService{IHSMService: hsmService}
+	routes["DopaService"] = &service.DopaService{IHTTPService: httpService}
 	return &service.HttpService{Routes: routes}
 }
 

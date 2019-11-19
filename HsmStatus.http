@@ -43,5 +43,26 @@ Content-Type: application/json
     "CO_TP_CD": "KSOFT"
   }
 }
+###
+POST http://localhost:8080/api
+Content-Type: application/json
+
+{
+  "Header": {
+    "funcNm": "DopaService",
+    "rqUID": "",
+    "rqDt": "",
+    "rqAppId": "123",
+    "userLangPref": "th"
+  },
+  "Body": {
+    "nid": "3850400100298",
+    "first_name": "พฤกษ์",
+    "middle_name": "",
+    "last_name": "นิลสุริยกร",
+    "birth_date": "25251127",
+    "laser_id": "ME0119564014"
+  }
+}
 
 ###

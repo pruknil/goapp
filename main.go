@@ -95,7 +95,7 @@ func NewRouter(httpService service.IHttpService, socketService service.ISocketSe
 //Http service
 func NewHttpService(hsmService hsm.IHSMService, httpService behttp.IHTTPService) service.IHttpService {
 	routes := make(map[string]service.IServiceTemplate)
-	routes["ExampleService"] = &service.ExampleService{IHTTPService: httpService, IHSMService: hsmService}
+	routes["AirQualityService"] = &service.AirQualityService{IHTTPService: httpService}
 	routes["KPeopleService"] = &service.KPeopleService{IHTTPService: httpService}
 	routes["HsmService"] = &service.HsmService{IHSMService: hsmService}
 	routes["DopaService"] = &service.DopaService{IHTTPService: httpService}

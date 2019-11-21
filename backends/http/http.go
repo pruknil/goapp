@@ -8,8 +8,6 @@ import (
 )
 
 type Client struct {
-	Username string
-	Password string
 	*breaker.CircuitBreaker
 	Config
 }
@@ -30,7 +28,6 @@ type Config struct {
 }
 
 func (s *Client) doRequest(req *http.Request) ([]byte, error) {
-	req.SetBasicAuth(s.Username, s.Password)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

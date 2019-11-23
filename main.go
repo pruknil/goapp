@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/pruknil/goapp/app"
-	behttp "github.com/pruknil/goapp/backends/http"
+	httpbackend "github.com/pruknil/goapp/backends/http"
 	service2 "github.com/pruknil/goapp/backends/http/service"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/logger"
@@ -80,11 +80,11 @@ func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
 
-func NewHttp(cfg app.Config) behttp.IHttpBackendService {
-	return behttp.New(cfg.Backend.Http)
+func NewHttp(cfg app.Config, log logger.AppLog) httpbackend.IHttpBackendService {
+	return httpbackend.New(cfg.Backend.Http, log)
 }
 
-func NewHttpBackend(s behttp.IHttpBackendService) service2.IHttpBackend {
+func NewHttpBackend(s httpbackend.IHttpBackendService) service2.IHttpBackend {
 	return service2.New(s)
 }
 

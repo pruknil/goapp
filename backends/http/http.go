@@ -2,18 +2,22 @@ package http
 
 import (
 	"fmt"
+	"github.com/pruknil/goapp/logger"
 	breaker "github.com/sony/gobreaker"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"time"
 )
 
 type Client struct {
 	*breaker.CircuitBreaker
 	Config
+	logger.AppLog
 }
 
-func New(c Config) IHttpBackendService {
+func New(c Config, log logger.AppLog) IHttpBackendService {
 	var st breaker.Settings
 	st.Name = "HTTP"
 	st.Timeout = 3
@@ -22,7 +26,7 @@ func New(c Config) IHttpBackendService {
 		return counts.Requests >= 3 && failureRatio >= 0.6
 	}
 	cb := breaker.NewCircuitBreaker(st)
-	return &Client{CircuitBreaker: cb, Config: c}
+	return &Client{CircuitBreaker: cb, Config: c, AppLog: log}
 }
 
 type Config struct {
@@ -42,7 +46,16 @@ func (s *Client) DoRequest(input Req) ([]byte, error) {
 		return nil, err
 	}
 	req.Header = input.Header
-	client := &http.Client{}
+	var netTransport = &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout: 5 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 5 * time.Second,
+	}
+	client := &http.Client{
+		Timeout:   time.Second * 10,
+		Transport: netTransport,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

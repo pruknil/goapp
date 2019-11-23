@@ -12,7 +12,7 @@ type Client struct {
 	Config
 }
 
-func New(c Config) IHTTPService {
+func New(c Config) IHttpBackendService {
 	var st breaker.Settings
 	st.Name = "HTTP"
 	st.Timeout = 3
@@ -27,7 +27,7 @@ func New(c Config) IHTTPService {
 type Config struct {
 }
 
-func (s *Client) doRequest(req *http.Request) ([]byte, error) {
+func (s *Client) DoRequest(req *http.Request) ([]byte, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/pruknil/goapp/app"
 	behttp "github.com/pruknil/goapp/backends/http"
+	"github.com/pruknil/goapp/backends/http/services"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router"
@@ -56,6 +57,7 @@ func buildContainer() *dig.Container {
 
 	errorWrap(container.Provide(NewHSM))
 	errorWrap(container.Provide(NewHttp))
+	errorWrap(container.Provide(NewHttpBackend))
 
 	errorWrap(container.Provide(NewRouter))
 	return container
@@ -78,8 +80,12 @@ func NewHSM(b hsm.IConnection, cfg app.Config) hsm.IHSMService {
 	return hsm.NewHSM(b, cfg.Hsm)
 }
 
-func NewHttp(cfg app.Config) behttp.IHTTPService {
+func NewHttp(cfg app.Config) behttp.IHttpBackendService {
 	return behttp.New(cfg.Backend.Http)
+}
+
+func NewHttpBackend(s behttp.IHttpBackendService) services.IHttpBackend {
+	return services.New(s)
 }
 
 //================= End BACKEND Section =================
@@ -93,12 +99,12 @@ func NewRouter(httpService service.IHttpService, socketService service.ISocketSe
 }
 
 //Http service
-func NewHttpService(hsmService hsm.IHSMService, httpService behttp.IHTTPService) service.IHttpService {
+func NewHttpService(hsmService hsm.IHSMService, httpService services.IHttpBackend) service.IHttpService {
 	routes := make(map[string]service.IServiceTemplate)
-	routes["AirQualityService"] = &service.AirQualityService{IHTTPService: httpService}
-	routes["KPeopleService"] = &service.KPeopleService{IHTTPService: httpService}
+	routes["AirQualityService"] = &service.AirQualityService{IHttpBackend: httpService}
+	routes["KPeopleService"] = &service.KPeopleService{IHttpBackend: httpService}
 	routes["HsmService"] = &service.HsmService{IHSMService: hsmService}
-	routes["DopaService"] = &service.DopaService{IHTTPService: httpService}
+	routes["DopaService"] = &service.DopaService{IHttpBackend: httpService}
 	return &service.HttpService{Routes: routes}
 }
 

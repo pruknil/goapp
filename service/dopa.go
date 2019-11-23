@@ -3,11 +3,12 @@ package service
 import (
 	"encoding/json"
 	"github.com/pruknil/goapp/backends/http"
+	"github.com/pruknil/goapp/backends/http/services"
 )
 
 type DopaService struct {
 	baseService
-	http.IHTTPService
+	services.IHttpBackend
 	backendReq http.DopaReq
 	backendRes *http.DopaRes
 }
@@ -27,7 +28,7 @@ func (s *DopaService) InputMapping() error {
 }
 
 func (s *DopaService) Business() error {
-	res, err := s.IHTTPService.DopaCheckLaser(s.backendReq)
+	res, err := s.IHttpBackend.DopaCheckLaser(s.backendReq)
 	s.backendRes = res
 	if err != nil {
 		return err

@@ -1,7 +1,10 @@
 package http
 
-type IHTTPService interface {
-	AirQuality() (*AQIRes, error)
+import "net/http"
+
+type IHttpBackendService interface {
+	/*AirQuality() (*AQIRes, error)
 	KPeopleGetData(KPeopleReq) (*KPeopleRes, error)
-	DopaCheckLaser(DopaReq) (*DopaRes, error)
+	DopaCheckLaser(DopaReq) (*DopaRes, error)*/
+	DoRequest(req *http.Request) ([]byte, error)
 }

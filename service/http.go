@@ -3,12 +3,13 @@ package service
 import (
 	"encoding/json"
 	"github.com/pruknil/goapp/backends/http"
+	"github.com/pruknil/goapp/backends/http/services"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 )
 
 type AirQualityService struct {
 	baseService
-	http.IHTTPService
+	services.IHttpBackend
 	backendResp *http.AQIRes
 }
 
@@ -25,7 +26,7 @@ func (s *AirQualityService) InputMapping() error {
 }
 
 func (s *AirQualityService) Business() error {
-	x, err := s.IHTTPService.AirQuality()
+	x, err := s.IHttpBackend.AirQuality()
 	s.backendResp = x
 	if err != nil {
 		return err
@@ -62,7 +63,7 @@ func (s *HsmService) Business() error {
 
 type KPeopleService struct {
 	baseService
-	http.IHTTPService
+	services.IHttpBackend
 	backendReq http.KPeopleReq
 	backendRes *http.KPeopleRes
 }
@@ -82,7 +83,7 @@ func (s *KPeopleService) InputMapping() error {
 }
 
 func (s *KPeopleService) Business() error {
-	res, err := s.IHTTPService.KPeopleGetData(s.backendReq)
+	res, err := s.IHttpBackend.KPeopleGetData(s.backendReq)
 	s.backendRes = res
 	if err != nil {
 		return err

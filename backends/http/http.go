@@ -47,13 +47,19 @@ func (s *Client) DoRequest(input Req) ([]byte, error) {
 	}
 	req.Header = input.Header
 	var netTransport = &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout: 5 * time.Second,
-		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
+		DialContext: (&net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 5 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          20,
+		IdleConnTimeout:       5 * time.Second,
+		TLSHandshakeTimeout:   5 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
+
 	client := &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   time.Second * 1,
 		Transport: netTransport,
 	}
 	resp, err := client.Do(req)

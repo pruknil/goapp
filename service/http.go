@@ -3,13 +3,13 @@ package service
 import (
 	"encoding/json"
 	"github.com/pruknil/goapp/backends/http"
-	"github.com/pruknil/goapp/backends/http/services"
+	"github.com/pruknil/goapp/backends/http/service"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 )
 
 type AirQualityService struct {
 	baseService
-	services.IHttpBackend
+	service.IHttpBackend
 	backendResp *http.AQIRes
 }
 
@@ -63,7 +63,7 @@ func (s *HsmService) Business() error {
 
 type KPeopleService struct {
 	baseService
-	services.IHttpBackend
+	service.IHttpBackend
 	backendReq http.KPeopleReq
 	backendRes *http.KPeopleRes
 }

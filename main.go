@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/pruknil/goapp/app"
 	behttp "github.com/pruknil/goapp/backends/http"
-	"github.com/pruknil/goapp/backends/http/services"
+	service2 "github.com/pruknil/goapp/backends/http/service"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router"
@@ -84,8 +84,8 @@ func NewHttp(cfg app.Config) behttp.IHttpBackendService {
 	return behttp.New(cfg.Backend.Http)
 }
 
-func NewHttpBackend(s behttp.IHttpBackendService) services.IHttpBackend {
-	return services.New(s)
+func NewHttpBackend(s behttp.IHttpBackendService) service2.IHttpBackend {
+	return service2.New(s)
 }
 
 //================= End BACKEND Section =================
@@ -99,7 +99,7 @@ func NewRouter(httpService service.IHttpService, socketService service.ISocketSe
 }
 
 //Http service
-func NewHttpService(hsmService hsm.IHSMService, httpService services.IHttpBackend) service.IHttpService {
+func NewHttpService(hsmService hsm.IHSMService, httpService service2.IHttpBackend) service.IHttpService {
 	routes := make(map[string]service.IServiceTemplate)
 	routes["AirQualityService"] = &service.AirQualityService{IHttpBackend: httpService}
 	routes["KPeopleService"] = &service.KPeopleService{IHttpBackend: httpService}

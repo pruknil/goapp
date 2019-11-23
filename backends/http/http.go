@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	breaker "github.com/sony/gobreaker"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -27,7 +28,20 @@ func New(c Config) IHttpBackendService {
 type Config struct {
 }
 
-func (s *Client) DoRequest(req *http.Request) ([]byte, error) {
+type Req struct {
+	*http.Request
+	Url    string
+	Method string
+	Body   io.Reader
+	Header map[string][]string
+}
+
+func (s *Client) DoRequest(input Req) ([]byte, error) {
+	req, err := http.NewRequest(input.Method, input.Url, input.Body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = input.Header
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

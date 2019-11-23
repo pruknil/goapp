@@ -1,0 +1,111 @@
+package service
+
+import (
+	"bytes"
+	"encoding/json"
+	http2 "github.com/pruknil/goapp/backends/http"
+	"net/url"
+	"strings"
+)
+
+type HttpBackendService struct {
+	Executor http2.IHttpBackendService
+}
+
+func New(service http2.IHttpBackendService) IHttpBackend {
+	return &HttpBackendService{Executor: service}
+}
+
+func (s *HttpBackendService) AirQuality() (*http2.AQIRes, error) {
+	/*	_ = http2.HttpReq{
+				Method: "GET",
+				Url:    "https://website-api.airvisual.com/v1/places/map?bbox=100.1972940089172,13.47902387099105,100.78038479108272,13.979292336476917&units.temperature=celsius&units.distance=kilometer&AQI=US&language=th",
+			}
+		const baseURL string = "https://website-api.airvisual.com/v1/places/map?bbox=100.1972940089172,13.47902387099105,100.78038479108272,13.979292336476917&units.temperature=celsius&units.distance=kilometer&AQI=US&language=th"
+		req, err := http.NewRequest("GET", baseURL, nil)
+		if err != nil {
+			return nil, err
+			}*/
+
+	header := make(map[string][]string)
+	header["Authorization"] = []string{"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyIsImtpZCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyJ9.eyJhdWQiOiJodHRwczovL2thc2lrb3JuYmFua2dyb3VwLmNvbS84ZmZmN2RjNi0yMTQ3LTQ0NWEtYjcwYy1kM2I3NTFiODlmYzIiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZTExZGY5Zi00NjE1LTQzNGYtYTZjNi04YTBjYjRmZmViNmMvIiwiaWF0IjoxNTczNTU2MjM0LCJuYmYiOjE1NzM1NTYyMzQsImV4cCI6MTU3MzU2MDEzNCwiYWNyIjoiMSIsImFpbyI6IjQyVmdZTmhmcWxnNE1jTEFtdWtSay91YkJUNnZqdnZxYVppdUw0bnVPbk43V3RGTGsyMEEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiYzUxNWFiMTItZDMzYy00MWEwLWFjMzEtNGMzZjUxN2RkYjUyIiwiYXBwaWRhY3IiOiIwIiwiZmFtaWx5X25hbWUiOiJOaWxzdXJpeWFrb24iLCJnaXZlbl9uYW1lIjoiUHJ1ayIsImlwYWRkciI6IjQ5LjIzMS4yMTIuMTQ4IiwibmFtZSI6IlBydWsgTmlsc3VyaXlha29uIiwib2lkIjoiMDRkNTJjOTctODM5Yy00MTI0LWI3NzMtYmY5OGFjYzdlODNjIiwib25wcmVtX3NpZCI6IlMtMS01LTIxLTM2ODgwOTM4NjItNDA4MjI2OTg0LTM1MTAwMzEyOTktMjMzMzYwIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoibzdXR2JYelNmVW9JNzFGMG5VeGk3cU1ESGpNOWo2MlNZdUNkci1tVnJkNCIsInRpZCI6IjhlMTFkZjlmLTQ2MTUtNDM0Zi1hNmM2LThhMGNiNGZmZWI2YyIsInVuaXF1ZV9uYW1lIjoicHJ1ay5uaUBrYnRnLnRlY2giLCJ1cG4iOiJwcnVrLm5pQGtidGcudGVjaCIsInV0aSI6IlE5TVEyUDJxWUUtSEtLVHRmcWJzQUEiLCJ2ZXIiOiIxLjAifQ.jZhdln3qkS0l_VOxbf-LQ-cfgg0y_35-xYR6w_Ril286XXy-pO6EKQJJLUF0qT6qcRWmLU_drCRsdvCryzqmKR_BpsvnbZXcnW3GhJWJMg2BD_82ynUdYG4DYrFd6nX9upmasYqPX4qpVORkkRjKyKtiUq7RK64P6CJIBxzUqiCEEYG1tuOxRjnY0PJWMfXHAvglPWDGU2XiHapSkxbQf3utcubSFE2tCYyuLBs8YVDWiNJMVpYKZ6amWXCzbXucGwxe3XIJFu-3eMDTt-25nVUiBUZX0GQCvKDV93fFfWSx7R6sxi8vzAlhLgC5FfHO5iCFxH8nTpYzG6VRKrclLw"}
+	header["Content-Type"] = []string{"application/x-www-form-urlencoded; charset=UTF-8"}
+	req := http2.Req{
+		Method: "GET",
+		Url:    "https://website-api.airvisual.com/v1/places/map?bbox=100.1972940089172,13.47902387099105,100.78038479108272,13.979292336476917&units.temperature=celsius&units.distance=kilometer&AQI=US&language=th",
+	}
+	byteRs, err := s.Executor.DoRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	var data http2.AQIRes
+	err = json.Unmarshal(byteRs, &data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
+}
+
+func (s *HttpBackendService) KPeopleGetData(kreq http2.KPeopleReq) (*http2.KPeopleRes, error) {
+
+	//const baseURL string = "https://iservice.kworkplace.com:8445/KProfile/api/getData"
+	data := url.Values{}
+	data.Set("EMP_ID", kreq.EMPID)
+	data.Set("CO_TP_CD", kreq.COTPCD)
+	/*	req, err := http.NewRequest("POST", baseURL, strings.NewReader(data.Encode()))
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyIsImtpZCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyJ9.eyJhdWQiOiJodHRwczovL2thc2lrb3JuYmFua2dyb3VwLmNvbS84ZmZmN2RjNi0yMTQ3LTQ0NWEtYjcwYy1kM2I3NTFiODlmYzIiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZTExZGY5Zi00NjE1LTQzNGYtYTZjNi04YTBjYjRmZmViNmMvIiwiaWF0IjoxNTczNTU2MjM0LCJuYmYiOjE1NzM1NTYyMzQsImV4cCI6MTU3MzU2MDEzNCwiYWNyIjoiMSIsImFpbyI6IjQyVmdZTmhmcWxnNE1jTEFtdWtSay91YkJUNnZqdnZxYVppdUw0bnVPbk43V3RGTGsyMEEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiYzUxNWFiMTItZDMzYy00MWEwLWFjMzEtNGMzZjUxN2RkYjUyIiwiYXBwaWRhY3IiOiIwIiwiZmFtaWx5X25hbWUiOiJOaWxzdXJpeWFrb24iLCJnaXZlbl9uYW1lIjoiUHJ1ayIsImlwYWRkciI6IjQ5LjIzMS4yMTIuMTQ4IiwibmFtZSI6IlBydWsgTmlsc3VyaXlha29uIiwib2lkIjoiMDRkNTJjOTctODM5Yy00MTI0LWI3NzMtYmY5OGFjYzdlODNjIiwib25wcmVtX3NpZCI6IlMtMS01LTIxLTM2ODgwOTM4NjItNDA4MjI2OTg0LTM1MTAwMzEyOTktMjMzMzYwIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoibzdXR2JYelNmVW9JNzFGMG5VeGk3cU1ESGpNOWo2MlNZdUNkci1tVnJkNCIsInRpZCI6IjhlMTFkZjlmLTQ2MTUtNDM0Zi1hNmM2LThhMGNiNGZmZWI2YyIsInVuaXF1ZV9uYW1lIjoicHJ1ay5uaUBrYnRnLnRlY2giLCJ1cG4iOiJwcnVrLm5pQGtidGcudGVjaCIsInV0aSI6IlE5TVEyUDJxWUUtSEtLVHRmcWJzQUEiLCJ2ZXIiOiIxLjAifQ.jZhdln3qkS0l_VOxbf-LQ-cfgg0y_35-xYR6w_Ril286XXy-pO6EKQJJLUF0qT6qcRWmLU_drCRsdvCryzqmKR_BpsvnbZXcnW3GhJWJMg2BD_82ynUdYG4DYrFd6nX9upmasYqPX4qpVORkkRjKyKtiUq7RK64P6CJIBxzUqiCEEYG1tuOxRjnY0PJWMfXHAvglPWDGU2XiHapSkxbQf3utcubSFE2tCYyuLBs8YVDWiNJMVpYKZ6amWXCzbXucGwxe3XIJFu-3eMDTt-25nVUiBUZX0GQCvKDV93fFfWSx7R6sxi8vzAlhLgC5FfHO5iCFxH8nTpYzG6VRKrclLw")
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")*/
+	header := make(map[string][]string)
+	header["Authorization"] = []string{"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyIsImtpZCI6IkJCOENlRlZxeWFHckdOdWVoSklpTDRkZmp6dyJ9.eyJhdWQiOiJodHRwczovL2thc2lrb3JuYmFua2dyb3VwLmNvbS84ZmZmN2RjNi0yMTQ3LTQ0NWEtYjcwYy1kM2I3NTFiODlmYzIiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZTExZGY5Zi00NjE1LTQzNGYtYTZjNi04YTBjYjRmZmViNmMvIiwiaWF0IjoxNTczNTU2MjM0LCJuYmYiOjE1NzM1NTYyMzQsImV4cCI6MTU3MzU2MDEzNCwiYWNyIjoiMSIsImFpbyI6IjQyVmdZTmhmcWxnNE1jTEFtdWtSay91YkJUNnZqdnZxYVppdUw0bnVPbk43V3RGTGsyMEEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiYzUxNWFiMTItZDMzYy00MWEwLWFjMzEtNGMzZjUxN2RkYjUyIiwiYXBwaWRhY3IiOiIwIiwiZmFtaWx5X25hbWUiOiJOaWxzdXJpeWFrb24iLCJnaXZlbl9uYW1lIjoiUHJ1ayIsImlwYWRkciI6IjQ5LjIzMS4yMTIuMTQ4IiwibmFtZSI6IlBydWsgTmlsc3VyaXlha29uIiwib2lkIjoiMDRkNTJjOTctODM5Yy00MTI0LWI3NzMtYmY5OGFjYzdlODNjIiwib25wcmVtX3NpZCI6IlMtMS01LTIxLTM2ODgwOTM4NjItNDA4MjI2OTg0LTM1MTAwMzEyOTktMjMzMzYwIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoibzdXR2JYelNmVW9JNzFGMG5VeGk3cU1ESGpNOWo2MlNZdUNkci1tVnJkNCIsInRpZCI6IjhlMTFkZjlmLTQ2MTUtNDM0Zi1hNmM2LThhMGNiNGZmZWI2YyIsInVuaXF1ZV9uYW1lIjoicHJ1ay5uaUBrYnRnLnRlY2giLCJ1cG4iOiJwcnVrLm5pQGtidGcudGVjaCIsInV0aSI6IlE5TVEyUDJxWUUtSEtLVHRmcWJzQUEiLCJ2ZXIiOiIxLjAifQ.jZhdln3qkS0l_VOxbf-LQ-cfgg0y_35-xYR6w_Ril286XXy-pO6EKQJJLUF0qT6qcRWmLU_drCRsdvCryzqmKR_BpsvnbZXcnW3GhJWJMg2BD_82ynUdYG4DYrFd6nX9upmasYqPX4qpVORkkRjKyKtiUq7RK64P6CJIBxzUqiCEEYG1tuOxRjnY0PJWMfXHAvglPWDGU2XiHapSkxbQf3utcubSFE2tCYyuLBs8YVDWiNJMVpYKZ6amWXCzbXucGwxe3XIJFu-3eMDTt-25nVUiBUZX0GQCvKDV93fFfWSx7R6sxi8vzAlhLgC5FfHO5iCFxH8nTpYzG6VRKrclLw"}
+	header["Content-Type"] = []string{"application/x-www-form-urlencoded; charset=UTF-8"}
+	req := http2.Req{
+		Method: "POST",
+		Url:    "https://iservice.kworkplace.com:8445/KProfile/api/getData",
+		Body:   strings.NewReader(data.Encode()),
+		Header: header,
+	}
+
+	bytes, err := s.Executor.DoRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	var out http2.KPeopleRes
+	err = json.Unmarshal(bytes, &out)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (s *HttpBackendService) DopaCheckLaser(kreq http2.DopaReq) (*http2.DopaRes, error) {
+	//const baseURL string = "https://epit.rd.go.th/EFILING/RegAjaxController?flag=chkLaserId"
+	jsReq, _ := json.Marshal(kreq)
+	/*	req, err := http.NewRequest("POST", baseURL, bytes.NewBuffer(jsReq))
+		if err != nil {
+			return nil, err
+			}*/
+	//req.Header.Set("Content-Type", "multipart/form-data")
+
+	header := make(map[string][]string)
+	header["Content-Type"] = []string{"multipart/form-data"}
+	req := http2.Req{
+		Method: "POST",
+		Url:    "https://epit.rd.go.th/EFILING/RegAjaxController?flag=chkLaserId",
+		Body:   bytes.NewBuffer(jsReq),
+		Header: header,
+	}
+
+	bytes, err := s.Executor.DoRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	var data http2.DopaRes
+	err = json.Unmarshal(bytes, &data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
+}

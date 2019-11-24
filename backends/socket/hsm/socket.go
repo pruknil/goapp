@@ -70,7 +70,7 @@ func (h *Connection) Open() error {
 	}
 	p, err := pool.NewChannelPool(h.config.PoolMin, h.config.PoolMax, factory)
 	if err != nil {
-		fmt.Println(err.Error())
+		h.log.Error.Println(err.Error())
 		return err
 	}
 	h.connPool = p

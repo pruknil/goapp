@@ -42,7 +42,7 @@ func (s *MySmtp) BuildMail(target string, body string, subject string) error {
 		"\r\nSubject: " + subject +
 		"\r\n" + contentType + "\r\n\r\n" +
 		body)
-	err := s.ISmtp.SendMail(s.host, auth, s.umail, []string{target}, msg)
+	err := s.ISmtp.sendMail(s.host, auth, s.umail, []string{target}, msg)
 	if err != nil {
 		return err
 	}
@@ -52,13 +52,13 @@ func (s *MySmtp) BuildMail(target string, body string, subject string) error {
 type RealSmtp struct {
 }
 
-func (s *RealSmtp) SendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
+func (s *RealSmtp) sendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
 	return smtp.SendMail(addr, a, from, to, msg)
 }
 
 type MockSmtp struct {
 }
 
-func (s *MockSmtp) SendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
+func (s *MockSmtp) sendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
 	return nil
 }

@@ -4,11 +4,6 @@ import (
 	"net/smtp"
 )
 
-type MySmtp struct {
-	ISmtp
-	umail, upw, host string
-}
-
 type loginAuth struct {
 	username, password string
 }
@@ -33,26 +28,34 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	return nil, nil
 }
 
-func (s *MySmtp) BuildMail(target string, body string, subject string) error {
-	auth := genLoginAuth(s.umail, s.upw)
+type Config struct {
+	from, password, host string
+}
+type MailService struct {
+	ISmtp
+	Config
+}
+
+func (s *MailService) BuildMail(to string, body string, subject string) error {
+	auth := genLoginAuth(s.from, s.password)
 
 	contentType := "Content-Type: text/plain" + "; charset=UTF-8"
-	msg := []byte("To: " + target +
-		"\r\nFrom: " + s.umail +
+	msg := []byte("To: " + to +
+		"\r\nFrom: " + s.from +
 		"\r\nSubject: " + subject +
 		"\r\n" + contentType + "\r\n\r\n" +
 		body)
-	err := s.ISmtp.sendMail(s.host, auth, s.umail, []string{target}, msg)
+	err := s.sendMail(s.host, auth, s.from, []string{to}, msg)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-type RealSmtp struct {
+type Smtp struct {
 }
 
-func (s *RealSmtp) sendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
+func (s *Smtp) sendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
 	return smtp.SendMail(addr, a, from, to, msg)
 }
 

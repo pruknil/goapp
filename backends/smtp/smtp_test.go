@@ -33,11 +33,13 @@ func TestMySmtp_BuildMail(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &MySmtp{
+			s := &MailService{
 				ISmtp: tt.fields.ISmtp,
-				umail: tt.fields.umail,
-				upw:   tt.fields.upw,
-				host:  tt.fields.host,
+				Config: Config{
+					from:     tt.fields.umail,
+					password: tt.fields.upw,
+					host:     tt.fields.host,
+				},
 			}
 			if err := s.BuildMail(tt.args.target, tt.args.body, tt.args.subject); (err != nil) != tt.wantErr {
 				t.Errorf("BuildMail() error = %v, wantErr %v", err, tt.wantErr)

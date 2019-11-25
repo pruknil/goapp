@@ -4,6 +4,7 @@ import (
 	"github.com/pruknil/goapp/app"
 	httpbackend "github.com/pruknil/goapp/backends/http"
 	service2 "github.com/pruknil/goapp/backends/http/service"
+	"github.com/pruknil/goapp/backends/smtp"
 	"github.com/pruknil/goapp/backends/socket/hsm"
 	"github.com/pruknil/goapp/logger"
 	"github.com/pruknil/goapp/router"
@@ -50,14 +51,14 @@ func buildContainer() *dig.Container {
 	errorWrap(container.Provide(NewConfig))
 	errorWrap(container.Provide(NewLogger))
 
-	errorWrap(container.Provide(NewHSMConn))
-
 	errorWrap(container.Provide(NewHttpService))
 	errorWrap(container.Provide(NewSocketService))
 
+	errorWrap(container.Provide(NewHSMConn))
 	errorWrap(container.Provide(NewHSM))
 	errorWrap(container.Provide(NewHttp))
 	errorWrap(container.Provide(NewHttpBackend))
+	errorWrap(container.Provide(NewSmtp))
 
 	errorWrap(container.Provide(NewRouter))
 	return container
@@ -89,6 +90,10 @@ func NewHttpBackend(s httpbackend.IHttpBackendService) service2.IHttpBackend {
 	return service2.New(s)
 }
 
+func NewSmtp(cfg app.Config) smtp.IMailService {
+	return smtp.New(&smtp.Smtp{}, cfg.Backend.Smtp)
+}
+
 //================= End BACKEND Section =================
 
 //Create all router here eg.. rest, socket, mq
@@ -100,12 +105,13 @@ func NewRouter(httpService service.IHttpService, socketService service.ISocketSe
 }
 
 //Http service
-func NewHttpService(hsmService hsm.IHSMService, httpService service2.IHttpBackend) service.IHttpService {
+func NewHttpService(hsmService hsm.IHSMService, httpService service2.IHttpBackend, mailService smtp.IMailService) service.IHttpService {
 	routes := make(map[string]service.IServiceTemplate)
 	routes["AirQualityService"] = &service.AirQualityService{IHttpBackend: httpService}
 	routes["KPeopleService"] = &service.KPeopleService{IHttpBackend: httpService}
 	routes["HsmService"] = &service.HsmService{IHSMService: hsmService}
 	routes["DopaService"] = &service.DopaService{IHttpBackend: httpService}
+	routes["MailService"] = &service.MailService{IMailService: mailService}
 	return &service.HttpService{Routes: routes}
 }
 
@@ -129,6 +135,11 @@ func NewConfig() app.Config {
 				WriteDeadline: five,
 				PoolMin:       5,
 				PoolMax:       5,
+			},
+			Smtp: smtp.Config{
+				From:     "p_nilsuriyakon@hotmail.com",
+				Password: "Aoom1346",
+				Host:     "smtp.office365.com:587",
 			},
 		},
 		Router: app.Router{

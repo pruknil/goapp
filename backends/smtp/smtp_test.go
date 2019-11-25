@@ -36,9 +36,9 @@ func TestMySmtp_BuildMail(t *testing.T) {
 			s := &MailService{
 				ISmtp: tt.fields.ISmtp,
 				Config: Config{
-					from:     tt.fields.umail,
-					password: tt.fields.upw,
-					host:     tt.fields.host,
+					From:     tt.fields.umail,
+					Password: tt.fields.upw,
+					Host:     tt.fields.host,
 				},
 			}
 			if err := s.BuildMail(tt.args.target, tt.args.body, tt.args.subject); (err != nil) != tt.wantErr {

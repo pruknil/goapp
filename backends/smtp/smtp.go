@@ -29,23 +29,28 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 }
 
 type Config struct {
-	from, password, host string
+	From, Password, Host string
 }
+
 type MailService struct {
 	ISmtp
 	Config
 }
 
+func New(s ISmtp, c Config) IMailService {
+	return &MailService{ISmtp: s, Config: c}
+}
+
 func (s *MailService) BuildMail(to string, body string, subject string) error {
-	auth := genLoginAuth(s.from, s.password)
+	auth := genLoginAuth(s.From, s.Password)
 
 	contentType := "Content-Type: text/plain" + "; charset=UTF-8"
 	msg := []byte("To: " + to +
-		"\r\nFrom: " + s.from +
+		"\r\nFrom: " + s.From +
 		"\r\nSubject: " + subject +
 		"\r\n" + contentType + "\r\n\r\n" +
 		body)
-	err := s.sendMail(s.host, auth, s.from, []string{to}, msg)
+	err := s.sendMail(s.Host, auth, s.From, []string{to}, msg)
 	if err != nil {
 		return err
 	}

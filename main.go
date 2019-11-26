@@ -112,6 +112,7 @@ func NewHttpService(hsmService hsm.IHSMService, httpService service2.IHttpBacken
 	routes["HsmService"] = &service.HsmService{IHSMService: hsmService}
 	routes["DopaService"] = &service.DopaService{IHttpBackend: httpService}
 	routes["MailService"] = &service.MailService{IMailService: mailService}
+	routes["QRService"] = &service.QRService{}
 	return &service.HttpService{Routes: routes}
 }
 

@@ -80,3 +80,17 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:8080/api
+Content-Type: application/json
+
+{
+  "Header": {
+    "funcNm": "QRService",
+    "rqUID": "",
+    "rqDt": "",
+    "rqAppId": "123",
+    "userLangPref": "th"
+  }
+}
+
+###

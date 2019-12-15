@@ -118,6 +118,7 @@ func NewHttpService(hsmService hsm.IHSMService, httpService service2.IHttpBacken
 
 //Socket service
 func NewSocketService() service.ISocketService {
+	//routes := make(map[string]service.IServiceTemplate)
 	return &service.SocketService{}
 }
 

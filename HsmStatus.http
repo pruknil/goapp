@@ -90,6 +90,9 @@ Content-Type: application/json
     "rqDt": "",
     "rqAppId": "123",
     "userLangPref": "th"
+  },
+  "Body": {
+    "input": "3450394857362"
   }
 }
 

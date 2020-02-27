@@ -12,10 +12,12 @@ require (
 	github.com/ethereum/go-ethereum v1.9.7
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-stack/stack v1.8.0 // indirect
+	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/ianlopshire/go-fixedwidth v0.4.6
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
+	github.com/rs/cors v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 	github.com/sony/gobreaker v0.4.1

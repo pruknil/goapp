@@ -92,7 +92,7 @@ Content-Type: application/json
     "userLangPref": "th"
   },
   "Body": {
-    "input": "3450394857362"
+    "input": "http://www.google.co.th"
   }
 }
 
